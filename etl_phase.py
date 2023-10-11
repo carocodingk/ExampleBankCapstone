@@ -3,6 +3,7 @@ import requests
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf, when, lower, concat_ws, col, to_timestamp
 from data_transf import phone_format, title_format, time_format
+from mysql.connector import Error
 from secret import db_username, db_password
 
 spark = SparkSession.builder.master("local[*]").appName("banksystemSpark").getOrCreate()
@@ -65,10 +66,20 @@ print("Data transformed")
 #####################################################################################################
 
 ''' DATA LOADING PHASE'''
+try:
+    #Establish a connection to MySQL Workbench to create database
+    db_connection = mysql.connector.connect(user=db_username, password=db_password)
+    db_cursor = db_connection.cursor()
+    db_cursor.execute("CREATE DATABASE IF NOT EXISTS creditcard_capstone_test;") #avoids error if the db already exists
+    print('Connection to database successful')
+except Error as e:
+    print('Failed to connect to Example bank database: {}'.format(e))
+finally:
+    if db_connection and db_connection.is_connected():
+        db_cursor.close()
+        db_connection.close()
+        print('Connection to database has been closed')
 
-db_connection = mysql.connector.connect(user=db_username, password=db_password)
-db_cursor = db_connection.cursor()
-db_cursor.execute("CREATE DATABASE IF NOT EXISTS creditcard_capstone_test;") #avoids error if the db already exists
 
 branchDF_transformed.write.format("jdbc").mode("overwrite") \
   .option("url", "jdbc:mysql://localhost:3306/creditcard_capstone_test") \
