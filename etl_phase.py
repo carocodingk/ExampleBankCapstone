@@ -6,14 +6,16 @@ from data_transf import phone_format, title_format, time_format
 from mysql.connector import Error
 from secret import db_username, db_password
 
+#####################################################################################################
+''' LOAN CREDIT CARD DATABASE(SQL)'''
+'''DATA EXTRACTION phase'''
+#####################################################################################################
 spark = SparkSession.builder.master("local[*]").appName("banksystemSpark").getOrCreate()
 
-''' LOAN CREDIT CARD DATABASE(SQL)
-    DATA EXTRACTION phase'''
 branchDF = spark.read.json("Credit_Card_Dataset/cdw_sapp_branch.json")
 creditDF = spark.read.json("Credit_Card_Dataset/cdw_sapp_credit.json")
 customerDF = spark.read.json("Credit_Card_Dataset/cdw_sapp_custmer.json") 
-print("Data extracted")
+print(">>>>> Success! Data extracted")
 
 '''Converts python functions into PySpark User Defined Functions'''
 phone_format_udf = udf(lambda x: phone_format(x))
@@ -22,6 +24,7 @@ time_format_udf = udf(lambda x: time_format(x))
 
 #####################################################################################################
 ''' DATA TRANSFORMATION phase'''
+#####################################################################################################
 branchDF_transformed = branchDF.select( col('BRANCH_CODE').cast('int'), \
                                         'BRANCH_NAME', \
                                         'BRANCH_STREET', \
@@ -61,24 +64,24 @@ creditDF_transformed = creditDF.select( 'CREDIT_CARD_NO', \
 # creditDF_transformed.show()
 # creditDF_transformed.printSchema()
 # creditDF.printSchema()
-print("Data transformed")
+print(">>>>> Success! Data transformed")
 
 #####################################################################################################
-
 ''' DATA LOADING PHASE'''
+#####################################################################################################
 try:
     #Establish a connection to MySQL Workbench to create database
     db_connection = mysql.connector.connect(user=db_username, password=db_password)
     db_cursor = db_connection.cursor()
     db_cursor.execute("CREATE DATABASE IF NOT EXISTS creditcard_capstone_test;") #avoids error if the db already exists
-    print('Connection to database successful')
+    print('>>>>> Success! Connection to database successful. Database created')
 except Error as e:
-    print('Failed to connect to Example bank database: {}'.format(e))
+    print('>>>>> Failed! Unable to connect to Example bank database: {}'.format(e))
 finally:
     if db_connection and db_connection.is_connected():
         db_cursor.close()
         db_connection.close()
-        print('Connection to database has been closed')
+        print('>>>>> Success! Connection to database has been closed')
 
 
 branchDF_transformed.write.format("jdbc").mode("overwrite") \
@@ -102,12 +105,12 @@ creditDF_transformed.write.format("jdbc").mode("overwrite") \
   .option("password", db_password) \
   .save()
 
-print("Data loaded into database")
+print(">>>>> Success! Data loaded into database")
 
 #####################################################################################################
-
 ''' LOAN APPLICATION DATASET - ACCESS TO LOAN API ENDPOINT
     LOADING PHASE'''
+#####################################################################################################
 loan_url = 'https://raw.githubusercontent.com/platformps/LoanDataset/main/loan_data.json'
 response = requests.get(loan_url) #fetch data from API
 if response.status_code == 200:
@@ -119,5 +122,6 @@ if response.status_code == 200:
         .option("user", db_username) \
         .option("password", db_password) \
         .save()
+    print('>>>>> Success! Loan Data loaded into database. Status code: {}'.format(response.status_code))
 else:
-    print('not working')
+    print('>>>>> Failed! Unable to load data into database. Status code: {}'.format(response.status_code))
