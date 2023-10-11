@@ -1,11 +1,7 @@
-# import pyspark
-# import data_transf
-
 import mysql.connector
-
+import requests
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf, when, lower, concat_ws, col, to_timestamp
-from pyspark.sql.types import StringType
 from data_transf import phone_format, title_format, time_format
 from secret import db_username, db_password
 
@@ -23,6 +19,7 @@ phone_format_udf = udf(lambda x: phone_format(x))
 title_format_udf = udf(lambda x: title_format(x))
 time_format_udf = udf(lambda x: time_format(x))
 
+#####################################################################################################
 ''' DATA TRANSFORMATION phase'''
 branchDF_transformed = branchDF.select( col('BRANCH_CODE').cast('int'), \
                                         'BRANCH_NAME', \
@@ -65,7 +62,10 @@ creditDF_transformed = creditDF.select( 'CREDIT_CARD_NO', \
 # creditDF.printSchema()
 print("Data transformed")
 
+#####################################################################################################
+
 ''' DATA LOADING PHASE'''
+
 db_connection = mysql.connector.connect(user=db_username, password=db_password)
 db_cursor = db_connection.cursor()
 db_cursor.execute("CREATE DATABASE IF NOT EXISTS creditcard_capstone_test;") #avoids error if the db already exists
@@ -92,3 +92,21 @@ creditDF_transformed.write.format("jdbc").mode("overwrite") \
   .save()
 
 print("Data loaded into database")
+
+#####################################################################################################
+
+''' LOAN APPLICATION DATASET - ACCESS TO LOAN API ENDPOINT
+    LOADING PHASE'''
+loan_url = 'https://raw.githubusercontent.com/platformps/LoanDataset/main/loan_data.json'
+response = requests.get(loan_url) #fetch data from API
+if response.status_code == 200:
+    loan = response.json()
+    loanDF = spark.createDataFrame(loan)
+    loanDF.write.format("jdbc").mode("overwrite") \
+        .option("url", "jdbc:mysql://localhost:3306/creditcard_capstone_test") \
+        .option("dbtable", "creditcard_capstone_test.CDW_SAPP_LOAN_APPLICATION") \
+        .option("user", db_username) \
+        .option("password", db_password) \
+        .save()
+else:
+    print('not working')
