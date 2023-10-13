@@ -2,7 +2,7 @@ import mysql.connector
 import re
 
 from mysql.connector import Error
-from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3
+from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
 from secret import db_username, db_password
 
 exit_flag = False
@@ -133,6 +133,8 @@ def transactions_state(self):
         continue_inquiry = False
         print(trans_menu_text3)
         state = input().upper()
+        if (len(state) > 2 and state in trans_states_dict.keys()):
+            state = trans_states_dict[state]
         query = """ SELECT COUNT(TRANSACTION_ID), SUM(TRANSACTION_VALUE)
                     FROM CDW_SAPP_CREDIT_CARD
                     INNER JOIN CDW_SAPP_BRANCH USING (BRANCH_CODE)
