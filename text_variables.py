@@ -117,5 +117,13 @@ Main > Customers
         (3) Show monthly bill for customer
         (4) Show customer's transactions
         (9) Return to previous menu
-        (0) Exit program
-"""
+        (0) Exit program"""
+
+cust_menu_text1 = """_______________________________________________
+Main > Customers
+    Lookup customer by:
+            (1) By SSN
+            (2) By credit card number
+            (3) By name
+            (9) Return to previous menu
+            (0) Exit program"""

@@ -3,7 +3,8 @@ import re
 
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
-from text_variables import cust_menu_text
+from text_variables import cust_menu_text, cust_menu_text1
+from data_transf import title_format
 from secret import db_username, db_password
 
 exit_flag = False
@@ -143,9 +144,58 @@ def transactions_state(self):
             print(transaction)
         continue_inquiry = continue_method()
 
+# class customer():
+
 def customers_menu():
-    cust = MenuBox(cust_menu_text, do_nothing, do_nothing, do_nothing)
+    cust = MenuBox(cust_menu_text, customers_details, do_nothing, do_nothing)
     cust.menu_box()
+
+def customers_details(self):
+
+    # lookup = 'x'
+    continue_inquiry = True
+
+    while (continue_inquiry):
+        continue_inquiry = False
+        print(cust_menu_text1)
+        lookup = input()
+        if lookup == '1':
+            print('Enter SSN:')
+            ssn = input()
+            customer_lookup('cust.SSN', ssn, 'x')
+        elif lookup == '2':
+            print('Enter credit card number:')
+            cred_card = input()
+            customer_lookup('cust.CREDIT_CARD_NO', cred_card, 'x')
+        elif lookup == '3':
+            print('Enter first name:')
+            first_name = title_format(input())
+            print('Enter last name')
+            last_name = title_format(input())
+            customer_lookup('cust.FIRST_NAME', first_name, last_name)
+        elif lookup == '9':
+            break
+        elif lookup == '0':
+            global exit_flag
+            exit_flag = True
+            break
+        else:
+            print('Invalid option. Try again')
+            continue_inquiry = True
+
+
+def customer_lookup(sql_key, value1, value2):
+    query = """ SELECT cust.FIRST_NAME, cust.LAST_NAME, cust.SSN, cust.CREDIT_CARD_NO
+                FROM cdw_sapp_customer AS cust
+                WHERE {} = '{}'""".format(sql_key, value1)
+    if value2 != 'x': #If the search is by first and last name. We need to values
+        query = query + " AND cust.LAST_NAME = '{}';".format(value2)
+    db_cursor.execute(query)
+    all_details = db_cursor.fetchall()
+    if len(all_details) > 0:
+        for d in all_details:
+            print(d)
+
 
 try:
     #   Establish connection to local database server
