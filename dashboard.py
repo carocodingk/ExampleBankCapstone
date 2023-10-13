@@ -184,7 +184,7 @@ def customers_search(self, method):
             continue_inquiry = True
 
 
-def customer_show_details(sql_key, value1, value2):
+def customer_query_details(sql_key, value1, value2):
     query = """ SELECT cust.FIRST_NAME, cust.LAST_NAME, cust.SSN, cust.CREDIT_CARD_NO
                 FROM cdw_sapp_customer AS cust
                 WHERE {} = '{}'""".format(sql_key, value1)
