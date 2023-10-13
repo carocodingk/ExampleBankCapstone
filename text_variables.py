@@ -109,3 +109,13 @@ trans_states_dict = {
     "WYOMING": "WY"
 }
 
+cust_menu_text = """_______________________________________________
+Main > Customers
+    Choose one of the options for customers:
+        (1) Show customer's details
+        (2) Modify customer's details
+        (3) Show monthly bill for customer
+        (4) Show customer's transactions
+        (9) Return to previous menu
+        (0) Exit program
+"""
