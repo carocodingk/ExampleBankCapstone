@@ -150,10 +150,10 @@ def transactions_state(self):
 
 
 def customers_menu():
-    cust = MenuBox(cust_menu_text, customers_details, do_nothing, do_nothing)
+    cust = MenuBox(cust_menu_text, customers_search, do_nothing, do_nothing)
     cust.menu_box()
 
-def customers_details(self):
+def customers_search(self):
     continue_inquiry = True
     while (continue_inquiry):
         continue_inquiry = False
