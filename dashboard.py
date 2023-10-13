@@ -2,23 +2,10 @@ import mysql.connector
 import re
 
 from mysql.connector import Error
-from text_variables import welcome, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2
+from text_variables import welcome, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict
 from secret import db_username, db_password
 
 exit_flag = False
-
-a = "text1"
-b = 'text2'
-c = 'text3'
-
-def p1(t):
-    print('1 ' + t)
-
-def p2(t):
-    print('2 ' + t)
-
-def p3(t):
-    print('3 ' + t)
 
 def do_nothing(self):
     pass
@@ -38,11 +25,11 @@ class MenuBox:
             menu_option = input()
             print('you chose {}'.format(menu_option))
             if menu_option == '1':
-                self.method1('A')
+                self.method1(self)
             elif menu_option == '2':
-                self.method2('B')
+                self.method2(self)
             elif menu_option == '3':
-                self.method3('C')
+                self.method3(self)
             elif menu_option == '9':
                 print('Back to previous menu')
                 break
@@ -56,15 +43,23 @@ class MenuBox:
         global exit_flag 
         exit_flag = True
 
+def continue_method():
+    print('Press any key to continue')
+    continue_key = input()
+    if len(continue_key) > 0:
+        return True    
+
 def transactions_menu():
-    tr = MenuBox(trans_menu_text, transactions_zipcode, transactions_type, p3)
+    tr = MenuBox(trans_menu_text, transactions_zipcode, transactions_type, do_nothing)
     tr.menu_box()
 
 def transactions_zipcode(self):
     zipcode = '0000' #initial value to enter in loop
     date = '01/1234'
+    continue_inquiry = True
 
-    while (True):
+    while (continue_inquiry):
+        continue_inquiry = False
         print(trans_menu_text1)
         zipcode = input()
         if (zipcode == '9'):
@@ -89,6 +84,42 @@ def transactions_zipcode(self):
                 print("No transactions for ZIP code {} in {}".format(zipcode, date))
         else:
             print('Your input is invalid. Try again')
+        continue_inquiry = continue_method()
+
+
+def transactions_type(self):
+    continue_inquiry = True
+    while (continue_inquiry):
+        continue_inquiry = False #Prevents that it keeps asking once a result is delivered
+        print(trans_menu_text2)
+        trans_type = input()
+        if (trans_type.isnumeric()):
+            if (int(trans_type) in range(1,8)):
+                query = """ SELECT COUNT(TRANSACTION_ID), SUM(TRANSACTION_VALUE)
+                FROM CDW_SAPP_CREDIT_CARD
+                WHERE TRANSACTION_TYPE = '{}'""".format(trans_type_dict[trans_type])
+                db_cursor.execute(query)
+                all_transactions = db_cursor.fetchall()
+                if len(all_transactions) > 0:
+                    print("Details of transactions of type {}".format(trans_type_dict[trans_type]))
+                    print("Number of transactions: {}".format(all_transactions[0][0]))
+                    print("Total value of transactions: $ {}".format(round(all_transactions[0][1], 2)))
+                else:
+                    print("No transactions")
+            elif (trans_type == '9'):
+                break
+            elif (trans_type == '0'):
+                global exit_flag
+                exit_flag = True
+                break
+            else:
+                print('Invalid option. Try again')
+        else:
+            print('another option {}'.format(trans_type))
+        continue_inquiry = continue_method() #if a key is entered, we can keep checking
+
+
+# def transactions_state(self):
 
 
 try:
@@ -101,14 +132,11 @@ try:
     )
     db_cursor = db_connection.cursor()   
     print('>>>>> Success! Connection to database established')
-    # print(welcome)
     while (not exit_flag):
         print(welcome)
         print(main_menu_text)
         main_menu_option = input()
         if main_menu_option == '1':
-            # print("transactions")
-            # m1 = MenuBox('hello',a,b,c,p1, p2, p3)
             transactions_menu()
         elif main_menu_option == '2':
             print("customers")
