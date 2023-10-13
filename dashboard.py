@@ -1,8 +1,8 @@
 import mysql.connector
-
+import re
 
 from mysql.connector import Error
-from text_variables import welcome, main_menu_text
+from text_variables import welcome, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2
 from secret import db_username, db_password
 
 exit_flag = False
@@ -20,13 +20,13 @@ def p2(t):
 def p3(t):
     print('3 ' + t)
 
+def do_nothing(self):
+    pass
+
 
 class MenuBox:
-    def __init__(self, menu_msg, msg1, msg2, msg3, method1, method2, method3): #constructor
+    def __init__(self, menu_msg, method1, method2, method3):  #constructor
         self.menu_msg = menu_msg
-        self.msg1 = msg1
-        self.msg2 = msg2
-        self.msg3 = msg3
         self.method1 = method1
         self.method2 = method2
         self.method3 = method3
@@ -38,11 +38,11 @@ class MenuBox:
             menu_option = input()
             print('you chose {}'.format(menu_option))
             if menu_option == '1':
-                self.method1(self.msg1)
+                self.method1('A')
             elif menu_option == '2':
-                self.method2(self.msg2)
+                self.method2('B')
             elif menu_option == '3':
-                self.method3(self.msg3)
+                self.method3('C')
             elif menu_option == '9':
                 print('Back to previous menu')
                 break
@@ -56,10 +56,39 @@ class MenuBox:
         global exit_flag 
         exit_flag = True
 
-# def transactions():
+def transactions_menu():
+    tr = MenuBox(trans_menu_text, transactions_zipcode, transactions_type, p3)
+    tr.menu_box()
 
+def transactions_zipcode(self):
+    zipcode = '0000' #initial value to enter in loop
+    date = '01/1234'
 
-
+    while (True):
+        print(trans_menu_text1)
+        zipcode = input()
+        if (zipcode == '9'):
+            break
+        print("Enter month and year (mm/yyyy):")
+        date = input()
+        if (date == '9'):
+            break
+        elif (zipcode.isnumeric() and len(zipcode) == 5 and re.match("\d\d/\d\d\d\d", date)):
+            date1 = date[3:7] + date[0:2]
+            query = """SELECT cred.CREDIT_CARD_NO, cred.TIMEID, cred.BRANCH_CODE, cred.TRANSACTION_TYPE, cred.TRANSACTION_VALUE, cred.TRANSACTION_ID
+                    FROM cdw_sapp_credit_card AS cred INNER JOIN cdw_sapp_customer USING(CREDIT_CARD_NO) 
+                    WHERE CUST_ZIP = {} AND cred.TIMEID LIKE '{}%'
+                    ORDER BY cred.TIMEID DESC""".format(zipcode, date1)
+            db_cursor.execute(query)
+            all_transactions = db_cursor.fetchall()
+            print(type(all_transactions))
+            if len(all_transactions) > 0:
+                for t in all_transactions:
+                    print(t)
+            else:
+                print("No transactions for ZIP code {} in {}".format(zipcode, date))
+        else:
+            print('Your input is invalid. Try again')
 
 
 try:
@@ -78,9 +107,9 @@ try:
         print(main_menu_text)
         main_menu_option = input()
         if main_menu_option == '1':
-            print("transactions")
-            m1 = MenuBox('hello',a,b,c,p1, p2, p3)
-            m1.menu_box()
+            # print("transactions")
+            # m1 = MenuBox('hello',a,b,c,p1, p2, p3)
+            transactions_menu()
         elif main_menu_option == '2':
             print("customers")
         elif main_menu_option == '3':
