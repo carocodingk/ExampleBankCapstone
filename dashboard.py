@@ -128,23 +128,20 @@ def transactions_type(self):
 
 def transactions_state(self):
     print("here")
-#     continue_inquiry = True
-#     while(continue_inquiry):
-#         continue_inquiry = False
-#         print(trans_menu_text3)
-#         state = input().upper()
-#         query = """ SELECT COUNT(TRANSACTION_ID), SUM(TRANSACTION_VALUE)
-#                     FROM CDW_SAPP_CREDIT_CARD
-#                     INNER JOIN CDW_SAPP_BRANCH USING (BRANCH_CODE)
-#                     WHERE BRANCH_STATE = '{}'""".format(state)
-#         db_cursor.execute(query)
-#         all_transactions = db_cursor.fetchall()
-#         for transaction in all_transactions:
-#             print(transaction)
-#         continue_inquiry = continue_method()
-#         x = input()
-#         if x == 'k':
-#             return
+    continue_inquiry = True
+    while(continue_inquiry):
+        continue_inquiry = False
+        print(trans_menu_text3)
+        state = input().upper()
+        query = """ SELECT COUNT(TRANSACTION_ID), SUM(TRANSACTION_VALUE)
+                    FROM CDW_SAPP_CREDIT_CARD
+                    INNER JOIN CDW_SAPP_BRANCH USING (BRANCH_CODE)
+                    WHERE BRANCH_STATE = '{}'""".format(state)
+        db_cursor.execute(query)
+        all_transactions = db_cursor.fetchall()
+        for transaction in all_transactions:
+            print(transaction)
+        continue_inquiry = continue_method()
 
 
 try:
