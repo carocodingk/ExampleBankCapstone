@@ -2,6 +2,10 @@ welcome = """#########################################################
 ##          WELCOME TO EXAMPLE BANK DASHBOARD          ## 
 #########################################################"""
 
+continue_text = """Press   (9) Return to previous menu
+        (0) Exit program
+        Any other key to continue"""
+
 main_menu_text = """_______________________________________________
 Please choose one of the following options:
 (1) TRANSACTIONS
@@ -50,10 +54,9 @@ trans_type_dict = {
 
 trans_menu_text3 = """_______________________________________________
 Main > Transactions > By State
-Please enter a state:
-"""
+Please enter a state:"""
 
-statesDict = {
+trans_states_dict = {
     "ALABAMA": "AL",
     "ALASKA": "AK",
     "ARIZONA": "AZ",

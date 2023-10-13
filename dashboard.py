@@ -2,7 +2,7 @@ import mysql.connector
 import re
 
 from mysql.connector import Error
-from text_variables import welcome, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict
+from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3
 from secret import db_username, db_password
 
 exit_flag = False
@@ -44,13 +44,19 @@ class MenuBox:
         exit_flag = True
 
 def continue_method():
-    print('Press any key to continue')
+    print(continue_text)
     continue_key = input()
-    if len(continue_key) > 0:
+    if continue_key == '9':
+        return False
+    elif continue_key == '0':
+        global exit_flag 
+        exit_flag = True
+        return False
+    else:
         return True    
 
 def transactions_menu():
-    tr = MenuBox(trans_menu_text, transactions_zipcode, transactions_type, do_nothing)
+    tr = MenuBox(trans_menu_text, transactions_zipcode, transactions_type, transactions_state)
     tr.menu_box()
 
 def transactions_zipcode(self):
@@ -117,9 +123,28 @@ def transactions_type(self):
         else:
             print('another option {}'.format(trans_type))
         continue_inquiry = continue_method() #if a key is entered, we can keep checking
+        print('there')
 
 
-# def transactions_state(self):
+def transactions_state(self):
+    print("here")
+#     continue_inquiry = True
+#     while(continue_inquiry):
+#         continue_inquiry = False
+#         print(trans_menu_text3)
+#         state = input().upper()
+#         query = """ SELECT COUNT(TRANSACTION_ID), SUM(TRANSACTION_VALUE)
+#                     FROM CDW_SAPP_CREDIT_CARD
+#                     INNER JOIN CDW_SAPP_BRANCH USING (BRANCH_CODE)
+#                     WHERE BRANCH_STATE = '{}'""".format(state)
+#         db_cursor.execute(query)
+#         all_transactions = db_cursor.fetchall()
+#         for transaction in all_transactions:
+#             print(transaction)
+#         continue_inquiry = continue_method()
+#         x = input()
+#         if x == 'k':
+#             return
 
 
 try:
