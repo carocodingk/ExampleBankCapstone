@@ -3,6 +3,7 @@ import re
 
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
+from text_variables import cust_menu_text
 from secret import db_username, db_password
 
 exit_flag = False
@@ -142,6 +143,9 @@ def transactions_state(self):
             print(transaction)
         continue_inquiry = continue_method()
 
+def customers_menu():
+    cust = MenuBox(cust_menu_text, do_nothing, do_nothing, do_nothing)
+    cust.menu_box()
 
 try:
     #   Establish connection to local database server
@@ -160,7 +164,7 @@ try:
         if main_menu_option == '1':
             transactions_menu()
         elif main_menu_option == '2':
-            print("customers")
+            customers_menu()
         elif main_menu_option == '3':
             print("loans")
         elif main_menu_option == '0':
