@@ -145,16 +145,16 @@ def transactions_state(self):
         continue_inquiry = continue_method()
 
 # class customer():
+#     def __init__(self, fname, mname, lname, cred):
+#         self.first_name = fname
+
 
 def customers_menu():
     cust = MenuBox(cust_menu_text, customers_details, do_nothing, do_nothing)
     cust.menu_box()
 
 def customers_details(self):
-
-    # lookup = 'x'
     continue_inquiry = True
-
     while (continue_inquiry):
         continue_inquiry = False
         print(cust_menu_text1)
@@ -162,17 +162,17 @@ def customers_details(self):
         if lookup == '1':
             print('Enter SSN:')
             ssn = input()
-            customer_lookup('cust.SSN', ssn, 'x')
+            customer_show_details('cust.SSN', ssn, 'x')
         elif lookup == '2':
             print('Enter credit card number:')
             cred_card = input()
-            customer_lookup('cust.CREDIT_CARD_NO', cred_card, 'x')
+            customer_show_details('cust.CREDIT_CARD_NO', cred_card, 'x')
         elif lookup == '3':
             print('Enter first name:')
-            first_name = title_format(input())
+            first_name = title_format(input()) #converts to title case format like in db
             print('Enter last name')
             last_name = title_format(input())
-            customer_lookup('cust.FIRST_NAME', first_name, last_name)
+            customer_show_details('cust.FIRST_NAME', first_name, last_name)
         elif lookup == '9':
             break
         elif lookup == '0':
@@ -184,7 +184,7 @@ def customers_details(self):
             continue_inquiry = True
 
 
-def customer_lookup(sql_key, value1, value2):
+def customer_show_details(sql_key, value1, value2):
     query = """ SELECT cust.FIRST_NAME, cust.LAST_NAME, cust.SSN, cust.CREDIT_CARD_NO
                 FROM cdw_sapp_customer AS cust
                 WHERE {} = '{}'""".format(sql_key, value1)
