@@ -160,7 +160,7 @@ try:
         if main_menu_option == '1':
             transactions_menu()
         elif main_menu_option == '2':
-            customers_menu()
+            print("customers")
         elif main_menu_option == '3':
             print("loans")
         elif main_menu_option == '0':
