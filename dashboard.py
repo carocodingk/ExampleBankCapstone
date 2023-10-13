@@ -10,7 +10,6 @@ exit_flag = False
 def do_nothing(self):
     pass
 
-
 class MenuBox:
     def __init__(self, menu_msg, method1, method2, method3):  #constructor
         self.menu_msg = menu_msg
@@ -92,7 +91,6 @@ def transactions_zipcode(self):
             print('Your input is invalid. Try again')
         continue_inquiry = continue_method()
 
-
 def transactions_type(self):
     continue_inquiry = True
     while (continue_inquiry):
@@ -124,7 +122,6 @@ def transactions_type(self):
             print('another option {}'.format(trans_type))
         continue_inquiry = continue_method() #if a key is entered, we can keep checking
         print('there')
-
 
 def transactions_state(self):
     print("here")
@@ -163,7 +160,7 @@ try:
         if main_menu_option == '1':
             transactions_menu()
         elif main_menu_option == '2':
-            print("customers")
+            customers_menu()
         elif main_menu_option == '3':
             print("loans")
         elif main_menu_option == '0':

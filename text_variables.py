@@ -15,7 +15,7 @@ Please choose one of the following options:
 
 trans_menu_text = """_______________________________________________
 Main > Transactions
-    Choose one of the options for transactions:
+    Choose one of the options to see transactions:
         (1) Per zip code for mm/yyyy
         (2) Per type
         (3) Per state
@@ -108,3 +108,4 @@ trans_states_dict = {
     "WISCONSIN": "WI",
     "WYOMING": "WY"
 }
+
