@@ -153,7 +153,7 @@ def customers_menu():
     cust = MenuBox(cust_menu_text, customers_search, do_nothing, do_nothing)
     cust.menu_box()
 
-def customers_search(self):
+def customers_search(self, method):
     continue_inquiry = True
     while (continue_inquiry):
         continue_inquiry = False
@@ -162,17 +162,17 @@ def customers_search(self):
         if lookup == '1':
             print('Enter SSN:')
             ssn = input()
-            customer_show_details('cust.SSN', ssn, 'x')
+            method('cust.SSN', ssn, 'x')
         elif lookup == '2':
             print('Enter credit card number:')
             cred_card = input()
-            customer_show_details('cust.CREDIT_CARD_NO', cred_card, 'x')
+            method('cust.CREDIT_CARD_NO', cred_card, 'x')
         elif lookup == '3':
             print('Enter first name:')
             first_name = title_format(input()) #converts to title case format like in db
             print('Enter last name')
             last_name = title_format(input())
-            customer_show_details('cust.FIRST_NAME', first_name, last_name)
+            method('cust.FIRST_NAME', first_name, last_name)
         elif lookup == '9':
             break
         elif lookup == '0':
