@@ -144,13 +144,8 @@ def transactions_state(self):
             print(transaction)
         continue_inquiry = continue_method()
 
-# class customer():
-#     def __init__(self, fname, mname, lname, cred):
-#         self.first_name = fname
-
-
 def customers_menu():
-    cust = MenuBox(cust_menu_text, customers_search, do_nothing, do_nothing)
+    cust = MenuBox(cust_menu_text, customers_show_details, do_nothing, customers_show_operations)
     cust.menu_box()
 
 def customers_search(self, method):
@@ -184,7 +179,12 @@ def customers_search(self, method):
             continue_inquiry = True
 
 
-def customer_query_details(sql_key, value1, value2):
+def customers_show_details(self):
+    customers_search(self, customers_query_details)
+    print("heeeelloooo")
+
+    
+def customers_query_details(sql_key, value1, value2):
     query = """ SELECT cust.FIRST_NAME, cust.LAST_NAME, cust.SSN, cust.CREDIT_CARD_NO
                 FROM cdw_sapp_customer AS cust
                 WHERE {} = '{}'""".format(sql_key, value1)
@@ -195,6 +195,75 @@ def customer_query_details(sql_key, value1, value2):
     if len(all_details) > 0:
         for d in all_details:
             print(d)
+
+
+
+# def customers_update_details():
+
+# def customers_monthly_bill():
+
+def customers_show_operations(self):
+    customers_search(self, customers_query_transactions)
+    print('customers_show_operations')
+
+def customers_query_transactions(sql_key, value1, value2):
+    if (sql_key == 'cust.SSN' or sql_key == 'cust.CREDIT_CARD_NO'):
+        identifier = value1
+        # sql_key = 
+        print("in the first if")
+        print(sql_key)
+    elif sql_key == 'cust.FIRST_NAME':
+        print("another spot")
+        subquery = """  SELECT CREDIT_CARD_NO
+                        FROM cdw_sapp_customer AS cust
+                        WHERE cust.FIRST_NAME = '{}' AND cust.LAST_NAME = '{}'""".format(value1, value2)
+        db_cursor.execute(subquery)
+        data = db_cursor.fetchone()
+        sql_key = 'cust.CREDIT_CARD_NO' #so we can use one query statement for all
+        if data is not None:
+            identifier = data[0]
+        else:
+            identifier = ' '
+
+    query = """ SELECT  cust.FIRST_NAME, cust.LAST_NAME, cust.CREDIT_CARD_NO, 
+                        cred.TIMEID, cred.TRANSACTION_ID, cred.TRANSACTION_TYPE, cred.TRANSACTION_VALUE
+                FROM cdw_sapp_customer AS cust
+                INNER JOIN cdw_sapp_credit_card AS cred USING (CREDIT_CARD_NO)
+                WHERE {} = '{}'""".format(sql_key, identifier)
+    
+    # if type == 1: #monthly bill
+    #     print('Enter date (mm/yyyy):')
+    #     date1 = input()
+    #     query = query + "AND TIMEID = '{}'".format(date1+'05')
+    # elif type == 2: #transactions between mm1/yyyy1 and mm2/yyyy2
+    #     print('Enter starting date (mm/yyyy):')
+    #     date1 = input()
+    #     print('Enter ending date (mm/yyyy):')
+    #     date2 = input()
+
+    # print('Enter date (mm/yyyy):')
+    # date1 = input()
+    # query = query + "AND TIMEID = '{}'".format(date1[3:7]+ date1[0:2] + '05' )
+
+    db_cursor.execute(query)
+    print('second query')
+    d = db_cursor.fetchall()
+    if d is not None:
+        for a in d:
+            print(a)
+
+
+
+
+
+    #         subquery = 
+    # query = """ SELECT cust.FIRST_NAME, cust.LAST_NAME, .cust.CREDIT_CARD_NO, cred.TIMEID, cred.TRANSACTION_ID, cred.TRANSACTION_TYPE, cred.TRANSACTION_VALUE
+    #             FROM cdw_sapp_customer AS cust
+             #   INNER JOIN cdw_sapp_credit_card AS cred USING (CREDIT_CARD_NO)"""
+    
+
+
+
 
 
 try:
