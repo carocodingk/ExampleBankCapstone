@@ -131,12 +131,29 @@ Main > Customers
 cust_menu_text2 = """__________________________________________________________
 Main > Customers > Update custommer
 Choose the field to update:
-                (1) First name
-                (2) Middle name
-                (3) Last name
-                (4) Full street address
-                (5) City
-                (6) State
-                (7) ZIP
-                (8) Phone
-                (9) Email"""
+                (1A) First name
+                (1B) Middle name
+                (1C) Last name
+                (2A) Full street address
+                (2B) City
+                (2C) State
+                (2D) ZIP
+                (3A) Phone
+                (3B) Email
+                (7)  Finish with updates
+                (8)  Cancel and go back to previos menu
+                (9)  Exit program"""
+
+cust_update_options = {
+    "1A": "FIRST_NAME",
+    "1B": "MIDDLE_NAME",
+    "1C": "LAST_NAME",
+    "2A": "FULL_STREET_ADDRESS",
+    "2B": "CUST_CITY",
+    "2C": "CUST_STATE",
+    "2D": "CUST_ZIP",
+    "3A": "CUST_PHONE",
+    "3B": "CUST_EMAIL"
+}
+
+
