@@ -6,14 +6,14 @@ continue_text = """Press   (9) Return to previous menu
         (0) Exit program
         Any other key to continue"""
 
-main_menu_text = """_______________________________________________
+main_menu_text = """__________________________________________________________
 Please choose one of the following options:
 (1) TRANSACTIONS
 (2) CUSTOMERS
 (3) LOANS
 (0) EXIT"""
 
-trans_menu_text = """_______________________________________________
+trans_menu_text = """__________________________________________________________
 Main > Transactions
     Choose one of the options to see transactions:
         (1) Per zip code for mm/yyyy
@@ -22,12 +22,12 @@ Main > Transactions
         (9) Return to previous menu
         (0) Exit program"""
 
-trans_menu_text1 = """_______________________________________________
+trans_menu_text1 = """__________________________________________________________
 Main > Transactions > By ZIPcode
 Enter 9 to go back
 Enter zip:"""
 
-trans_menu_text2 = """_______________________________________________
+trans_menu_text2 = """__________________________________________________________
 Main > Transactions > By Type
 Enter 9 to go back
 Please choose a transaction type:
@@ -52,7 +52,7 @@ trans_type_dict = {
     "7": "Test"
 }
 
-trans_menu_text3 = """_______________________________________________
+trans_menu_text3 = """__________________________________________________________
 Main > Transactions > By State
 Please enter a state:"""
 
@@ -109,7 +109,7 @@ trans_states_dict = {
     "WYOMING": "WY"
 }
 
-cust_menu_text = """_______________________________________________
+cust_menu_text = """__________________________________________________________
 Main > Customers
     Choose one of the options for customers:
         (1) Show customer's details
@@ -119,7 +119,7 @@ Main > Customers
         (9) Return to previous menu
         (0) Exit program"""
 
-cust_menu_text1 = """_______________________________________________
+cust_menu_text1 = """__________________________________________________________
 Main > Customers
     Lookup customer by:
             (1) By SSN
@@ -127,3 +127,16 @@ Main > Customers
             (3) By name
             (9) Return to previous menu
             (0) Exit program"""
+
+cust_menu_text2 = """__________________________________________________________
+Main > Customers > Update custommer
+Choose the field to update:
+                (1) First name
+                (2) Middle name
+                (3) Last name
+                (4) Full street address
+                (5) City
+                (6) State
+                (7) ZIP
+                (8) Phone
+                (9) Email"""
