@@ -12,6 +12,11 @@ exit_flag = False
 def do_nothing(self):
     pass
 
+''' This function is a placeholder to generalize functions for 3 or parameters. In only prints invalid option 
+    and then the loop continues until a valid option is entered'''
+def invalid_option():
+    print('Invalid option. Try again')
+
 class MenuBox:
     def __init__(self, menu_msg, method1, method2, method3):  #constructor
         self.menu_msg = menu_msg
@@ -31,6 +36,8 @@ class MenuBox:
                 self.method2(self)
             elif menu_option == '3':
                 self.method3(self)
+            elif menu_option == '4':
+                self.method4(self)
             elif menu_option == '9':
                 print('Back to previous menu')
                 break
@@ -57,7 +64,7 @@ def continue_method():
         return True    
 
 def transactions_menu():
-    tr = MenuBox(trans_menu_text, transactions_zipcode, transactions_type, transactions_state)
+    tr = MenuBox(trans_menu_text, transactions_zipcode, transactions_type, transactions_state, invalid_option)
     tr.menu_box()
 
 def transactions_zipcode(self):
