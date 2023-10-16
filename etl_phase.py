@@ -40,7 +40,7 @@ branchDF_transformed = branchDF.select( col('BRANCH_CODE').cast('int'), \
 
 customerDF_transformed = customerDF.select( col('SSN').cast('int'), \
                                             title_format_udf('FIRST_NAME').alias('FIRST_NAME'), \
-                                            lower('MIDDLE_NAME').alias('MIDDLE_MAME'), \
+                                            lower('MIDDLE_NAME').alias('MIDDLE_NAME'), \
                                             title_format_udf('LAST_NAME').alias('LAST_NAME'), \
                                             'CREDIT_CARD_NO', \
                                             concat_ws(', ', 'STREET_NAME', 'APT_NO').alias('FULL_STREET_ADDRESS'), \

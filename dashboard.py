@@ -3,7 +3,7 @@ import re
 
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
-from text_variables import cust_menu_text, cust_menu_text1
+from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2
 from data_transf import title_format
 from secret import db_username, db_password
 
@@ -34,7 +34,7 @@ class MenuBox:
             if menu_option == '1':
                 self.method1(self, menu_option)
             elif menu_option == '2':
-                self.method2(self)
+                self.method2(self, menu_option)
             elif menu_option == '3':
                 self.method3(self, menu_option)
             elif menu_option == '4':
@@ -153,7 +153,7 @@ def transactions_state(self, menu_option):
         continue_inquiry = continue_method()
 
 def customers_menu():
-    cust = MenuBox(cust_menu_text, customers_show_details, do_nothing, customers_show_operations, customers_show_operations)
+    cust = MenuBox(cust_menu_text, customers_show_details, customers_show_details, customers_show_operations, customers_show_operations)
     cust.menu_box()
 
 def customers_search(self, menu_option, method):
@@ -193,7 +193,7 @@ def customers_show_details(self, menu_option):
 
 
 #menu_option just a place_holder    
-def customers_query_details(sql_key, value1, value2, placeholder):
+def customers_query_details(sql_key, value1, value2, menu_option):
     query = """ SELECT cust.FIRST_NAME, cust.LAST_NAME, cust.SSN, cust.CREDIT_CARD_NO
                 FROM cdw_sapp_customer AS cust
                 WHERE {} = '{}'""".format(sql_key, value1)
@@ -204,6 +204,19 @@ def customers_query_details(sql_key, value1, value2, placeholder):
     if len(all_details) > 0:
         for d in all_details:
             print(d)
+    
+    if menu_option == '2': #update customer's details
+        customers_update_details()
+        print('AT THIS POINT ' + menu_option)
+
+def customers_update_details():
+    save_updates = False
+    # while (not save_updates):
+    #     print(cust_menu_text2)
+    #     option = input()
+    #     if option == 
+
+
 
 
 def customers_show_operations(self, menu_option):
@@ -251,12 +264,13 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
         date1 = date1[3:7]+date1[0:2] #Format as db
         query1 = query1 + "AND TIMEID like '{}%'".format(date1)
         # Add total and number of transactions
-        query2 = """SELECT  cred.CREDIT_CARD_NO, cust.FIRST_NAME, cust.MIDDLE_MAME, cust.LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL,
+        query2 = """SELECT  cred.CREDIT_CARD_NO, cust.FIRST_NAME, MIDDLE_MAME, cust.LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL,
                             COUNT(cred.TRANSACTION_ID), SUM(cred.TRANSACTION_VALUE)
                     FROM cdw_sapp_credit_card AS cred
                     INNER JOIN cdw_sapp_customer AS cust USING (CREDIT_CARD_NO)
                     WHERE {} = '{}' AND TIMEID like '{}%'
                     GROUP BY CREDIT_CARD_NO, FIRST_NAME, MIDDLE_MAME, LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL""".format(sql_key, identifier, date1)
+        print("at this other point")
         db_cursor.execute(query2)
         total_transactions = db_cursor.fetchall()
         if total_transactions is not None:
@@ -272,15 +286,19 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
         date2 = int(date2[3:7]+date2[0:2]+'31')
         print(date1, date2)
     
+    print('breakpoint1')
     query1 = query1 + 'ORDER BY TIMEID DESC'
     db_cursor.execute(query1)
     all_transactions = db_cursor.fetchall()
+    print('breakpoint2')
 
-    if menu_option == 3:
+    if menu_option == '3':  #Monthly bill
+        print('printing1')
         if all_transactions is not None:
             for t in all_transactions:
                 print(t)
-    else:
+        print('printing2')
+    elif menu_option == '4': #Transactions between dates
         if all_transactions is not None:
             for t in all_transactions:
                 if (int(t[0]) >= date1 and int(t[0]) <= date2):
