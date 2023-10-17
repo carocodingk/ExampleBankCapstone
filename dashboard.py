@@ -386,14 +386,14 @@ def viz_top_customer_transactions(null):
 
 """Find and plot the percentage of applications approved for self-employed applicants."""
 def viz_approved_applications(null):
+    applications = [] #[self_employed_approved, self_employed_rejected, not_self_employed_approved, not_self_employed_rejected]
     #Number of self employed applicants that are approved
     query1 = """SELECT COUNT(DISTINCT Application_ID)
                 FROM cdw_sapp_loan_application
                 WHERE Application_Status = 'Y' AND Self_Employed = 'Yes';"""
     db_cursor.execute(query1)
     data = db_cursor.fetchone()
-    num_selfemp_approved = data[0]
-    print(num_selfemp_approved)
+    applications.append(data[0])
 
     #Number of self employed applicants that are rejected
     query2 = """SELECT COUNT(DISTINCT Application_ID)
@@ -401,17 +401,15 @@ def viz_approved_applications(null):
                 WHERE Application_Status = 'N' AND Self_Employed = 'Yes';"""
     db_cursor.execute(query2)
     data = db_cursor.fetchone()
-    num_selfemp_not_approved = data[0]
-    print(num_selfemp_not_approved)
-    
+    applications.append(data[0])
+
     #Number of NOT self employed applicants that are approved
     query3 = """SELECT COUNT(DISTINCT Application_ID)
                 FROM cdw_sapp_loan_application
                 WHERE Application_Status = 'Y' AND Self_Employed = 'No';"""
     db_cursor.execute(query3)
     data = db_cursor.fetchone()
-    num_not_selfemp_approved = data[0]
-    print(num_not_selfemp_approved)
+    applications.append(data[0])
 
     #Number of NOT self employed applicants that are rejected
     query4 = """SELECT COUNT(DISTINCT Application_ID)
@@ -419,12 +417,40 @@ def viz_approved_applications(null):
                 WHERE Application_Status = 'N' AND Self_Employed = 'No';"""
     db_cursor.execute(query4)
     data = db_cursor.fetchone()
-    num_not_selfemp_not_approved = data[0]
-    print(num_not_selfemp_not_approved)
+    applications.append(data[0])
+
+    total_applications = sum(applications)
+    percentage_application = []
+    print(applications)
+    print(total_applications)
+
+    for i in applications:
+        percentage_application.append(round(i * 100 / total_applications, 2))
+    print(percentage_application)
+
+    print("Percentage of applications approved for self-employed applicants: {}%".format(percentage_application[0]))
+
 
 """Find the percentage of rejection for married male applicants."""
-
-
+def viz_rejected_marital(null):
+    #(Approved, Gender, Married)
+    criteria = [('Y', "Male", "Yes"), ('Y', "Male", "No"), ('Y', "Female", "Yes"), ('Y', "Female", "No"),
+                ('N', "Male", "Yes"), ('N', "Male", "No"), ('N', "Female", "Yes"), ('N', "Female", "No")]
+    applications = []
+    for i in criteria:
+        query = """ SELECT COUNT(DISTINCT Application_ID)
+                    FROM cdw_sapp_loan_application
+                    WHERE Application_Status = '{}' AND Gender = '{}' AND Married = '{}';""".format(i[0], i[1], i[2])
+        db_cursor.execute(query)
+        data = db_cursor.fetchone()
+        applications.append(data[0])
+    print(applications)
+    total_applications = sum(applications)
+    percentage_application = []
+    for i in applications:
+        percentage_application.append(round(i * 100 / total_applications))
+    print(percentage_application)
+    print("Percentage of applications REJECTED for MARRIED MALE applicants: {}%".format(percentage_application[4]))
 
 """Find and plot the top three months with the largest volume of transaction data."""
 
@@ -441,7 +467,7 @@ def visualizations():
         if option == '1':
             menu_box(viz_text1, viz_transactions_types, viz_high_number_customers, viz_top_customer_transactions, invalid_option)
         elif option == '2':
-            menu_box(viz_text2, viz_approved_applications, invalid_option, invalid_option, invalid_option)
+            menu_box(viz_text2, viz_approved_applications, viz_rejected_marital, invalid_option, invalid_option)
         elif option == '9':
             break
         elif option == '0':
