@@ -73,7 +73,7 @@ try:
     #Establish a connection to MySQL Workbench to create database
     db_connection = mysql.connector.connect(user=db_username, password=db_password)
     db_cursor = db_connection.cursor()
-    db_cursor.execute("CREATE DATABASE IF NOT EXISTS creditcard_capstone_test;") #avoids error if the db already exists
+    db_cursor.execute("CREATE DATABASE IF NOT EXISTS creditcard_capstone;") #avoids error if the db already exists
     print('>>>>> Success! Connection to database successful. Database created')
 except Error as e:
     print('>>>>> Failed! Unable to connect to Example bank database: {}'.format(e))
@@ -85,22 +85,22 @@ finally:
 
 
 branchDF_transformed.write.format("jdbc").mode("overwrite") \
-  .option("url", "jdbc:mysql://localhost:3306/creditcard_capstone_test") \
-  .option("dbtable", "creditcard_capstone_test.CDW_SAPP_BRANCH") \
+  .option("url", "jdbc:mysql://localhost:3306/creditcard_capstone") \
+  .option("dbtable", "creditcard_capstone.CDW_SAPP_BRANCH") \
   .option("user", db_username) \
   .option("password", db_password) \
   .save()
 
 customerDF_transformed.write.format("jdbc").mode("overwrite") \
-  .option("url", "jdbc:mysql://localhost:3306/creditcard_capstone_test") \
-  .option("dbtable", "creditcard_capstone_test.CDW_SAPP_CUSTOMER") \
+  .option("url", "jdbc:mysql://localhost:3306/creditcard_capstone") \
+  .option("dbtable", "creditcard_capstone.CDW_SAPP_CUSTOMER") \
   .option("user", db_username) \
   .option("password", db_password) \
   .save()
 
 creditDF_transformed.write.format("jdbc").mode("overwrite") \
-  .option("url", "jdbc:mysql://localhost:3306/creditcard_capstone_test") \
-  .option("dbtable", "creditcard_capstone_test.CDW_SAPP_CREDIT_CARD") \
+  .option("url", "jdbc:mysql://localhost:3306/creditcard_capstone") \
+  .option("dbtable", "creditcard_capstone.CDW_SAPP_CREDIT_CARD") \
   .option("user", db_username) \
   .option("password", db_password) \
   .save()
@@ -117,8 +117,8 @@ if response.status_code == 200:
     loan = response.json()
     loanDF = spark.createDataFrame(loan)
     loanDF.write.format("jdbc").mode("overwrite") \
-        .option("url", "jdbc:mysql://localhost:3306/creditcard_capstone_test") \
-        .option("dbtable", "creditcard_capstone_test.CDW_SAPP_LOAN_APPLICATION") \
+        .option("url", "jdbc:mysql://localhost:3306/creditcard_capstone") \
+        .option("dbtable", "creditcard_capstone.CDW_SAPP_LOAN_APPLICATION") \
         .option("user", db_username) \
         .option("password", db_password) \
         .save()

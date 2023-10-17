@@ -3,7 +3,7 @@ import re
 
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
-from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2
+from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2, cust_update_dict
 from data_transf import title_format
 from secret import db_username, db_password
 
@@ -101,7 +101,7 @@ def transactions_zipcode(self, placeholder):
             print('Your input is invalid. Try again')
         continue_inquiry = continue_method()
 
-def transactions_type(self):
+def transactions_type(self, null):
     continue_inquiry = True
     while (continue_inquiry):
         continue_inquiry = False #Prevents that it keeps asking once a result is delivered
@@ -202,19 +202,55 @@ def customers_query_details(sql_key, value1, value2, menu_option):
     db_cursor.execute(query)
     all_details = db_cursor.fetchall()
     if len(all_details) > 0:
-        for d in all_details:
-            print(d)
-    
+        # for d in all_details:
+        #     print(d)
+        # print(all_details)
+        (first_name, last_name, ssn, credit_card_no) = all_details[0]
+        print("heeere   {},{},{},{}".format(first_name, last_name, ssn, credit_card_no))
+    print('at this point ' + menu_option)
     if menu_option == '2': #update customer's details
-        customers_update_details()
+        customers_update_details(credit_card_no)
         print('AT THIS POINT ' + menu_option)
 
-def customers_update_details():
+def customers_update_details(credit_card_no):
     save_updates = False
-    # while (not save_updates):
-    #     print(cust_menu_text2)
-    #     option = input()
-    #     if option == 
+    updated_data = ""
+    while (not save_updates):
+        print(cust_menu_text2)
+        option = input().upper()
+        if option in cust_update_dict.keys():
+            field = cust_update_dict[option]
+            print("New value for {}".format(field))
+            new_value = input()
+            if field == 'CUST_ZIP':
+                updated_data = updated_data + " {} = {},".format(field, new_value)
+                print(type(new_value))
+            else:
+                updated_data = updated_data + " {} = '{}',".format(field, new_value)
+        elif option == '8':
+            save_updates = True
+            updated_data = updated_data[0:len(updated_data)-1]
+            print(updated_data)
+            # db_connection.start_transaction()
+            update = """UPDATE cdw_sapp_customer
+                        SET {}
+                        WHERE CREDIT_CARD_NO = '{}'""".format(updated_data, credit_card_no)
+            # update = """UPDATE cdw_sapp_customer
+            #             SET FIRST_NAME = 'JOSE'
+            #             WHERE CREDIT_CARD_NO = '123456100'"""
+            print(update)
+            db_cursor.execute(update)
+            db_connection.commit()
+            print('Data has been updated')
+            #here we update the db and commit
+        elif option == '9':
+            break
+        elif option == '0':
+            global exit_flag
+            exit_flag = True
+            break #We don't use save_updates because we are not saving the changes. 
+        else:
+            print("Invalid option. Try again")
 
 
 
@@ -264,12 +300,12 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
         date1 = date1[3:7]+date1[0:2] #Format as db
         query1 = query1 + "AND TIMEID like '{}%'".format(date1)
         # Add total and number of transactions
-        query2 = """SELECT  cred.CREDIT_CARD_NO, cust.FIRST_NAME, MIDDLE_MAME, cust.LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL,
+        query2 = """SELECT  cred.CREDIT_CARD_NO, cust.FIRST_NAME, MIDDLE_NAME, cust.LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL,
                             COUNT(cred.TRANSACTION_ID), SUM(cred.TRANSACTION_VALUE)
                     FROM cdw_sapp_credit_card AS cred
                     INNER JOIN cdw_sapp_customer AS cust USING (CREDIT_CARD_NO)
                     WHERE {} = '{}' AND TIMEID like '{}%'
-                    GROUP BY CREDIT_CARD_NO, FIRST_NAME, MIDDLE_MAME, LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL""".format(sql_key, identifier, date1)
+                    GROUP BY CREDIT_CARD_NO, FIRST_NAME, MIDDLE_NAME, LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL""".format(sql_key, identifier, date1)
         print("at this other point")
         db_cursor.execute(query2)
         total_transactions = db_cursor.fetchall()
