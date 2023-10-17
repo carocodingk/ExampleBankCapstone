@@ -84,3 +84,24 @@ def print_monthly_bill(date, bill_summary, all_transactions):
     else:
         print('This account does not exist in our database')
     
+
+def print_transactions(date1, date2, dates, customer_info, identifier, all_transactions):
+    if customer_info is not None and all_transactions is not None:
+        text = "\nClient: {} {} {}\n".format(customer_info[0], customer_info[1], customer_info[2])
+        text = text + "Acount: {} \n\n".format(privacy_string(identifier))
+        text = text + "       TRANSACTIONS BETWEEN {} AND {}\n".format(dates[0], dates[1])
+        trans = []
+        header = ['Date', 'Trans. ID', 'Description', 'Amount ($)']
+        for tr in all_transactions:
+            if (int(tr[0]) >= date1 and int(tr[0]) <= date2): #filtering by dates
+                date = tr[0][4:6] + '/' + tr[0][6:] + '/' + tr[0][0:2]
+                trans.append([date, tr[1], tr[2], round(tr[3],2)])
+        print(text)
+        if len(trans) > 0:
+            print(tabulate(trans, headers=header, tablefmt='pretty'))   
+        else:     
+            print("There are not transactions under this criteria")
+    elif customer_info is None:
+        print('This account does not exist in our database')
+    # elif customer_info is not None and all_transactions is None:
+    #     print("There are not transactions under this criteria")

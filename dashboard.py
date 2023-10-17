@@ -4,7 +4,7 @@ import re
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
 from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2, cust_update_dict
-from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill
+from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill, print_transactions
 from secret import db_username, db_password
 
 exit_flag = False
@@ -285,30 +285,46 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
                     INNER JOIN cdw_sapp_customer USING (CREDIT_CARD_NO)
                     WHERE {} = '{}' AND TIMEID like '{}%'
                     GROUP BY CREDIT_CARD_NO, FIRST_NAME, MIDDLE_NAME, LAST_NAME, FULL_STREET_ADDRESS, CUST_CITY, CUST_STATE, CUST_COUNTRY, CUST_ZIP, CUST_EMAIL""".format(sql_key, identifier, date1)
-        db_cursor.execute(query2)
-        bill_summary = db_cursor.fetchone()
+        # db_cursor.execute(query2)
+        # bill_summary = db_cursor.fetchone()
     elif menu_option == '4': #transactions between mm1/yyyy1 and mm2/yyyy2
         print('Enter starting date (mm/yyyy):')
         date1 = input()
-        date1 = int(date1[3:7]+date1[0:2]+'01')
+        temp1 = date1[3:7]+date1[0:2] #convert to db format
         print('Enter ending date (mm/yyyy):')
         date2 = input()
-        date2 = int(date2[3:7]+date2[0:2]+'31')
-        print(date1, date2)
-    
+        temp2 = date2[3:7]+date2[0:2]
+        if (int(temp1) > int(temp2)):   #Check if first time input is earlier than the second. Rectify if not
+            temp = date1
+            date1 = date2
+            date2 = temp
+        dates = (date1, date2)
+        date1 = int(date1[3:7]+date1[0:2]+'01')
+        date2 = int(date2[3:7]+date2[0:2]+'31') #it doesn't matter that a month has 28, 29, 30 days. No filtering error possible
+        # print(date1, date2)
+        # print(dates)
+        query2 = """SELECT FIRST_NAME, MIDDLE_NAME, LAST_NAME
+                    FROM cdw_sapp_customer
+                    WHERE CREDIT_CARD_NO = '{}'""".format(identifier)
+        # print(query2)
+        # print(identifier)
     # Phase 4: Complete and execute de query for all transactions
+    # print('first point')
+    db_cursor.execute(query2)
+    # print('this other point')
+    account_summary = db_cursor.fetchone()
+    # print(type(account_summary))
     query1 = query1 + 'ORDER BY TIMEID DESC'
+    # print('second point')
     db_cursor.execute(query1)
     all_transactions = db_cursor.fetchall()
+    # print(all_transactions)
 
     # Phase 5: Output the data retrieved in their respective format
     if menu_option == '3':  #Monthly bill
-        print_monthly_bill(date, bill_summary, all_transactions)
+        print_monthly_bill(date, account_summary, all_transactions)
     elif menu_option == '4': #Transactions between dates
-        if all_transactions is not None:
-            for t in all_transactions:
-                if (int(t[0]) >= date1 and int(t[0]) <= date2): #filtering by dates
-                    print(t[0] + '   ' + str(t[1]) + ' hhhhhhh ' + t[2] + str(t[3]))
+        print_transactions(date1, date2, dates, account_summary, identifier, all_transactions)
 
 
 try:
