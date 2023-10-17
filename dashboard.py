@@ -4,53 +4,42 @@ import re
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
 from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2, cust_update_dict
-from data_transf import title_format
+from data_transf import title_format, print_zip_report, print_short_report
 from secret import db_username, db_password
 
 exit_flag = False
 
-def do_nothing(self):
-    pass
-
 ''' This function is a placeholder to generalize functions for 3 or parameters. In only prints invalid option 
     and then the loop continues until a valid option is entered. Menu_option is just a placeholder'''
-def invalid_option(self, menu_option):
+def invalid_option(menu_option):
     print('Invalid option. Try again')
 
-class MenuBox:
-    def __init__(self, menu_msg, method1, method2, method3, method4):  #constructor
-        self.menu_msg = menu_msg
-        self.method1 = method1
-        self.method2 = method2
-        self.method3 = method3
-        self.method4 = method4
 
-    def menu_box(self):
-        print("good morning")
-        while(not exit_flag):         
-            print(self.menu_msg)
-            menu_option = input()
-            print('you chose {}'.format(menu_option))
-            if menu_option == '1':
-                self.method1(self, menu_option)
-            elif menu_option == '2':
-                self.method2(self, menu_option)
-            elif menu_option == '3':
-                self.method3(self, menu_option)
-            elif menu_option == '4':
-                self.method4(self, menu_option)
-            elif menu_option == '9':
-                print('Back to previous menu')
-                break
-            elif menu_option == '0':
-                print("Exit the program")
-                self.exit_program()
-            else:
-                print("Invalid option. Try again")
+def menu_box(menu_msg, method1, method2, method3, method4):
+    while(not exit_flag):         
+        print(menu_msg)
+        menu_option = input()
+        # print('you chose {}'.format(menu_option))
+        if menu_option == '1':
+            method1(menu_option)
+        elif menu_option == '2':
+            method2(menu_option)
+        elif menu_option == '3':
+            method3(menu_option)
+        elif menu_option == '4':
+            method4(menu_option)
+        elif menu_option == '9':
+            print('>>>>> Back to previous menu')
+            break
+        elif menu_option == '0':
+            exit_program()
+        else:
+            print(">>>>> Invalid option. Try again")
                 
-    def exit_program(self):
-        global exit_flag 
-        exit_flag = True
+def exit_program():
+    global exit_flag 
+    exit_flag = True
+    print(">>>>> Exit the program")
 
 def continue_method():
     print(continue_text)
@@ -58,17 +47,15 @@ def continue_method():
     if continue_key == '9':
         return False
     elif continue_key == '0':
-        global exit_flag 
-        exit_flag = True
+        exit_program()
         return False
     else:
         return True    
 
 def transactions_menu():
-    tr = MenuBox(trans_menu_text, transactions_zipcode, transactions_type, transactions_state, invalid_option)
-    tr.menu_box()
+    menu_box(trans_menu_text, transactions_zipcode, transactions_type, transactions_state, invalid_option)
 
-def transactions_zipcode(self, placeholder):
+def transactions_zipcode(null):
     zipcode = '0000' #initial value to enter in loop
     date = '01/1234'
     continue_inquiry = True
@@ -85,23 +72,19 @@ def transactions_zipcode(self, placeholder):
             break
         elif (zipcode.isnumeric() and len(zipcode) == 5 and re.match("\d\d/\d\d\d\d", date)):
             date1 = date[3:7] + date[0:2]
-            query = """SELECT cred.CREDIT_CARD_NO, cred.TIMEID, cred.BRANCH_CODE, cred.TRANSACTION_TYPE, cred.TRANSACTION_VALUE, cred.TRANSACTION_ID
-                    FROM cdw_sapp_credit_card AS cred INNER JOIN cdw_sapp_customer USING(CREDIT_CARD_NO) 
+            query = """SELECT cred.CREDIT_CARD_NO, cred.BRANCH_CODE, cred.TIMEID, cred.TRANSACTION_ID, cred.TRANSACTION_TYPE, cred.TRANSACTION_VALUE
+                    FROM cdw_sapp_credit_card AS cred 
+                    INNER JOIN cdw_sapp_customer USING(CREDIT_CARD_NO) 
                     WHERE CUST_ZIP = {} AND cred.TIMEID LIKE '{}%'
                     ORDER BY cred.TIMEID DESC""".format(zipcode, date1)
             db_cursor.execute(query)
             all_transactions = db_cursor.fetchall()
-            print(type(all_transactions))
-            if len(all_transactions) > 0:
-                for t in all_transactions:
-                    print(t)
-            else:
-                print("No transactions for ZIP code {} in {}".format(zipcode, date))
+            print_zip_report(date, zipcode, all_transactions)
         else:
             print('Your input is invalid. Try again')
         continue_inquiry = continue_method()
 
-def transactions_type(self, null):
+def transactions_type(null):
     continue_inquiry = True
     while (continue_inquiry):
         continue_inquiry = False #Prevents that it keeps asking once a result is delivered
@@ -114,17 +97,18 @@ def transactions_type(self, null):
                 WHERE TRANSACTION_TYPE = '{}'""".format(trans_type_dict[trans_type])
                 db_cursor.execute(query)
                 all_transactions = db_cursor.fetchall()
-                if len(all_transactions) > 0:
-                    print("Details of transactions of type {}".format(trans_type_dict[trans_type]))
-                    print("Number of transactions: {}".format(all_transactions[0][0]))
-                    print("Total value of transactions: $ {}".format(round(all_transactions[0][1], 2)))
-                else:
-                    print("No transactions")
+                print_short_report(trans_type, all_transactions)
+                # if len(all_transactions) > 0:
+                #     print("DETAILS OF TRANSACTIONS OF TYPE {}".format(trans_type_dict[trans_type].upper()))
+                #     print("------------------------------------------")
+                #     print("Number of transactions: {}".format(all_transactions[0][0]))
+                #     print("Total value of transactions: ${}".format(round(all_transactions[0][1], 2)))
+                # else:
+                #     print("No transactions")
             elif (trans_type == '9'):
                 break
             elif (trans_type == '0'):
-                global exit_flag
-                exit_flag = True
+                exit_program()
                 break
             else:
                 print('Invalid option. Try again')
@@ -133,7 +117,7 @@ def transactions_type(self, null):
         continue_inquiry = continue_method() #if a key is entered, we can keep checking
         print('there')
 
-def transactions_state(self, menu_option):
+def transactions_state(menu_option):
     print("here " + menu_option)
     continue_inquiry = True
     while(continue_inquiry):
@@ -153,10 +137,9 @@ def transactions_state(self, menu_option):
         continue_inquiry = continue_method()
 
 def customers_menu():
-    cust = MenuBox(cust_menu_text, customers_show_details, customers_show_details, customers_show_operations, customers_show_operations)
-    cust.menu_box()
+    menu_box(cust_menu_text, customers_show_details, customers_show_details, customers_show_operations, customers_show_operations)
 
-def customers_search(self, menu_option, method):
+def customers_search(menu_option, method):
     continue_inquiry = True
     while (continue_inquiry):
         continue_inquiry = False
@@ -179,16 +162,15 @@ def customers_search(self, menu_option, method):
         elif lookup == '9':
             break
         elif lookup == '0':
-            global exit_flag
-            exit_flag = True
+            exit_program()
             break
         else:
             print('Invalid option. Try again')
             continue_inquiry = True
 
 
-def customers_show_details(self, menu_option):
-    customers_search(self, menu_option, customers_query_details)
+def customers_show_details(menu_option):
+    customers_search(menu_option, customers_query_details)
     print("heeeelloooo")
 
 
@@ -230,15 +212,12 @@ def customers_update_details(credit_card_no):
         elif option == '8':
             save_updates = True
             updated_data = updated_data[0:len(updated_data)-1]
-            print(updated_data)
+            # print(updated_data)
             # db_connection.start_transaction()
             update = """UPDATE cdw_sapp_customer
                         SET {}
                         WHERE CREDIT_CARD_NO = '{}'""".format(updated_data, credit_card_no)
-            # update = """UPDATE cdw_sapp_customer
-            #             SET FIRST_NAME = 'JOSE'
-            #             WHERE CREDIT_CARD_NO = '123456100'"""
-            print(update)
+            # print(update)
             db_cursor.execute(update)
             db_connection.commit()
             print('Data has been updated')
@@ -246,8 +225,7 @@ def customers_update_details(credit_card_no):
         elif option == '9':
             break
         elif option == '0':
-            global exit_flag
-            exit_flag = True
+            exit_program()
             break #We don't use save_updates because we are not saving the changes. 
         else:
             print("Invalid option. Try again")
@@ -255,9 +233,9 @@ def customers_update_details(credit_card_no):
 
 
 
-def customers_show_operations(self, menu_option):
-    customers_search(self, menu_option, customers_query_transactions)
-    print('customers_show_operations')
+def customers_show_operations(menu_option):
+    customers_search(menu_option, customers_query_transactions)
+    # print('customers_show_operations')
 
 def customers_query_transactions(sql_key, value1, value2, menu_option):
     subquery = ""
@@ -284,11 +262,6 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
     print(identifier)
 
     #General query with some customer's details and transactions
-    # query1 = """ SELECT  cust.FIRST_NAME, cust.LAST_NAME, cust.CREDIT_CARD_NO, 
-    #                     cred.TIMEID, cred.TRANSACTION_ID, cred.TRANSACTION_TYPE, cred.TRANSACTION_VALUE
-    #             FROM cdw_sapp_customer AS cust
-    #             INNER JOIN cdw_sapp_credit_card AS cred USING (CREDIT_CARD_NO)
-    #             WHERE {} = '{}'""".format(sql_key, identifier)
     query1 = """ SELECT cred.TIMEID, cred.TRANSACTION_ID, cred.TRANSACTION_TYPE, cred.TRANSACTION_VALUE
                 FROM cdw_sapp_credit_card AS cred
                 WHERE {} = '{}'""".format(sql_key, identifier)
@@ -306,11 +279,11 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
                     INNER JOIN cdw_sapp_customer AS cust USING (CREDIT_CARD_NO)
                     WHERE {} = '{}' AND TIMEID like '{}%'
                     GROUP BY CREDIT_CARD_NO, FIRST_NAME, MIDDLE_NAME, LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL""".format(sql_key, identifier, date1)
-        print("at this other point")
+        # print("at this other point")
         db_cursor.execute(query2)
         total_transactions = db_cursor.fetchall()
         if total_transactions is not None:
-            print('count and total')
+            # print('count and total')
             for f in total_transactions:
                 print(f)
     elif menu_option == '4': #transactions between mm1/yyyy1 and mm2/yyyy2
@@ -322,18 +295,18 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
         date2 = int(date2[3:7]+date2[0:2]+'31')
         print(date1, date2)
     
-    print('breakpoint1')
+    # print('breakpoint1')
     query1 = query1 + 'ORDER BY TIMEID DESC'
     db_cursor.execute(query1)
     all_transactions = db_cursor.fetchall()
-    print('breakpoint2')
+    # print('breakpoint2')
 
     if menu_option == '3':  #Monthly bill
-        print('printing1')
+        # print('printing1')
         if all_transactions is not None:
             for t in all_transactions:
                 print(t)
-        print('printing2')
+        # print('printing2')
     elif menu_option == '4': #Transactions between dates
         if all_transactions is not None:
             for t in all_transactions:
