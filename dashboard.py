@@ -1,9 +1,11 @@
 import mysql.connector
 import re
+import matplotlib.pyplot as plt
 
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
 from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2, cust_update_dict
+from text_variables import viz_text, viz_text1, viz_text2
 from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill, print_transactions
 from secret import db_username, db_password
 
@@ -326,6 +328,128 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
     elif menu_option == '4': #Transactions between dates
         print_transactions(date1, date2, dates, account_summary, identifier, all_transactions)
 
+"""Find and plot which transaction type has the highest transaction count."""
+def viz_transactions_types(null):
+    query = """  SELECT TRANSACTION_TYPE, COUNT(DISTINCT TRANSACTION_ID) AS COUNT
+    FROM cdw_sapp_credit_card
+    GROUP BY TRANSACTION_TYPE
+    ORDER BY COUNT DESC;"""
+    print("heeeeree")
+    db_cursor.execute(query)
+    all_data = db_cursor.fetchall()
+    trans_type = []
+    trans_count = []
+    for t in all_data:
+        trans_type.append(t[0])
+        trans_count.append(t[1])
+    print(trans_type)
+    print(trans_count)
+    plt.pie(trans_count)
+    plt.show()
+
+"""Find and plot which state has a high number of customers."""
+def viz_high_number_customers(null):
+    query = """ SELECT CUST_STATE, COUNT(DISTINCT CREDIT_CARD_NO) AS COUNT
+                FROM cdw_sapp_customer
+                GROUP BY CUST_STATE
+                ORDER BY COUNT DESC
+                LIMIT 5;"""
+    db_cursor.execute(query)
+    all_data = db_cursor.fetchall()
+    cust_state = []
+    cust_count = []
+    for c in all_data:
+        cust_state.append(c[0])
+        cust_count.append(c[1])
+    print(cust_state)
+    print(cust_count)
+
+
+"""Find and plot the sum of all transactions for the top 10 customers, and which customer has the highest transaction amount.
+Hint (use CUST_SSN).  Don’t show ppi (ssn) how to represent?"""
+def viz_top_customer_transactions(null):
+    query = """ SELECT CUST_SSN, SUM(TRANSACTION_VALUE) AS TOTAL
+                FROM cdw_sapp_credit_card
+                GROUP BY CUST_SSN
+                ORDER BY TOTAL DESC
+                LIMIT 10;"""
+    db_cursor.execute(query)
+    all_data = db_cursor.fetchall()
+    cust_id =[]
+    cust_total = []
+    for data in all_data:
+        cust_id.append(data[0])
+        cust_total.append(data[1])
+    print(cust_id)
+    print(cust_total)
+
+
+"""Find and plot the percentage of applications approved for self-employed applicants."""
+def viz_approved_applications(null):
+    #Number of self employed applicants that are approved
+    query1 = """SELECT COUNT(DISTINCT Application_ID)
+                FROM cdw_sapp_loan_application
+                WHERE Application_Status = 'Y' AND Self_Employed = 'Yes';"""
+    db_cursor.execute(query1)
+    data = db_cursor.fetchone()
+    num_selfemp_approved = data[0]
+    print(num_selfemp_approved)
+
+    #Number of self employed applicants that are rejected
+    query2 = """SELECT COUNT(DISTINCT Application_ID)
+                FROM cdw_sapp_loan_application
+                WHERE Application_Status = 'N' AND Self_Employed = 'Yes';"""
+    db_cursor.execute(query2)
+    data = db_cursor.fetchone()
+    num_selfemp_not_approved = data[0]
+    print(num_selfemp_not_approved)
+    
+    #Number of NOT self employed applicants that are approved
+    query3 = """SELECT COUNT(DISTINCT Application_ID)
+                FROM cdw_sapp_loan_application
+                WHERE Application_Status = 'Y' AND Self_Employed = 'No';"""
+    db_cursor.execute(query3)
+    data = db_cursor.fetchone()
+    num_not_selfemp_approved = data[0]
+    print(num_not_selfemp_approved)
+
+    #Number of NOT self employed applicants that are rejected
+    query4 = """SELECT COUNT(DISTINCT Application_ID)
+                FROM cdw_sapp_loan_application
+                WHERE Application_Status = 'N' AND Self_Employed = 'No';"""
+    db_cursor.execute(query4)
+    data = db_cursor.fetchone()
+    num_not_selfemp_not_approved = data[0]
+    print(num_not_selfemp_not_approved)
+
+"""Find the percentage of rejection for married male applicants."""
+
+
+
+"""Find and plot the top three months with the largest volume of transaction data."""
+
+
+
+"""Find and plot which branch processed the highest total dollar value of healthcare transactions."""
+
+def visualizations():
+    continue_inquiry = True
+    while (continue_inquiry):
+        continue_inquiry = False
+        print(viz_text)
+        option = input()
+        if option == '1':
+            menu_box(viz_text1, viz_transactions_types, viz_high_number_customers, viz_top_customer_transactions, invalid_option)
+        elif option == '2':
+            menu_box(viz_text2, viz_approved_applications, invalid_option, invalid_option, invalid_option)
+        elif option == '9':
+            break
+        elif option == '0':
+            exit_program()
+        else:
+            print("Invalid option. Try again")
+
+
 
 try:
     #   Establish connection to local database server
@@ -346,7 +470,8 @@ try:
         elif main_menu_option == '2':
             customers_menu()
         elif main_menu_option == '3':
-            print("loans")
+            print("visualization")
+            visualizations()
         elif main_menu_option == '0':
             exit_flag = True
             print("exit program. loop1")
