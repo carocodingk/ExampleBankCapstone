@@ -140,11 +140,11 @@ Choose the field to update:
                 (2D) ZIP
                 (3A) Phone
                 (3B) Email
-                (7)  Finish with updates
-                (8)  Cancel and go back to previos menu
-                (9)  Exit program"""
+                (8)  Finish with updates
+                (9)  Cancel and go back to previos menu
+                (0)  Exit program without saving updates"""
 
-cust_update_options = {
+cust_update_dict = {
     "1A": "FIRST_NAME",
     "1B": "MIDDLE_NAME",
     "1C": "LAST_NAME",
