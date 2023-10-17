@@ -4,7 +4,7 @@ import re
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
 from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2, cust_update_dict
-from data_transf import title_format, print_zip_report, print_short_report
+from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill
 from secret import db_username, db_password
 
 exit_flag = False
@@ -240,7 +240,7 @@ def customers_update_details(credit_card_no):
 
 def customers_show_operations(menu_option):
     customers_search(menu_option, customers_query_transactions)
-    # print('customers_show_operations')
+
 
 def customers_query_transactions(sql_key, value1, value2, menu_option):
     #Phase 1: retrieves or assigns the credit card number as criteria to search the database
@@ -274,22 +274,19 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
     #Phase 3: Select specific time period. If monthly statement just month/year. If transactions asks for two dates,
     if menu_option == '3': #monthly bill
         print('Enter date (mm/yyyy):')
-        date1 = input()
-        date1 = date1[3:7]+date1[0:2] #Format as db
+        date = input()
+        date1 = date[3:7]+date[0:2] #Format as db
         query1 = query1 + "AND TIMEID like '{}%'".format(date1) #Queries only for that month
         # Find customer's details for bill as well as number of transactions and total for that month
-        query2 = """SELECT  cred.CREDIT_CARD_NO, cust.FIRST_NAME, MIDDLE_NAME, cust.LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL,
-                            COUNT(cred.TRANSACTION_ID), SUM(cred.TRANSACTION_VALUE)
-                    FROM cdw_sapp_credit_card AS cred
-                    INNER JOIN cdw_sapp_customer AS cust USING (CREDIT_CARD_NO)
+        query2 = """SELECT  CREDIT_CARD_NO, FIRST_NAME, MIDDLE_NAME, LAST_NAME, FULL_STREET_ADDRESS, CUST_CITY, CUST_STATE, 
+                            CUST_COUNTRY, CUST_ZIP, CUST_EMAIL,
+                            COUNT(TRANSACTION_ID), SUM(TRANSACTION_VALUE)
+                    FROM cdw_sapp_credit_card 
+                    INNER JOIN cdw_sapp_customer USING (CREDIT_CARD_NO)
                     WHERE {} = '{}' AND TIMEID like '{}%'
-                    GROUP BY CREDIT_CARD_NO, FIRST_NAME, MIDDLE_NAME, LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL""".format(sql_key, identifier, date1)
+                    GROUP BY CREDIT_CARD_NO, FIRST_NAME, MIDDLE_NAME, LAST_NAME, FULL_STREET_ADDRESS, CUST_CITY, CUST_STATE, CUST_COUNTRY, CUST_ZIP, CUST_EMAIL""".format(sql_key, identifier, date1)
         db_cursor.execute(query2)
-        bill_summary = db_cursor.fetchall()
-        # if total_transactions is not None:
-        #     print('count and total')
-        #     for f in total_transactions:
-        #         print(f)
+        bill_summary = db_cursor.fetchone()
     elif menu_option == '4': #transactions between mm1/yyyy1 and mm2/yyyy2
         print('Enter starting date (mm/yyyy):')
         date1 = input()
@@ -306,11 +303,7 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
 
     # Phase 5: Output the data retrieved in their respective format
     if menu_option == '3':  #Monthly bill
-        # print('printing1')
-        if all_transactions is not None:
-            for t in all_transactions:
-                print(t)
-        # print('printing2')
+        print_monthly_bill(date, bill_summary, all_transactions)
     elif menu_option == '4': #Transactions between dates
         if all_transactions is not None:
             for t in all_transactions:
