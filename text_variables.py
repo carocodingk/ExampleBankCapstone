@@ -11,7 +11,7 @@ Main
 Please choose one of the following options:
 (1) TRANSACTIONS
 (2) CUSTOMERS
-(3) LOANS
+(3) VISUALIZATIONS
 (0) EXIT"""
 
 trans_menu_text = """__________________________________________________________
@@ -20,6 +20,7 @@ Choose one of the options to see transactions:
     (1) Per zip code for date (mm/yyyy)
     (2) Per type
     (3) Per state
+    (4) Visualization
     (9) Return to previous menu
     (0) Exit program"""
 
@@ -156,4 +157,23 @@ cust_update_dict = {
     "3B": "CUST_EMAIL"
 }
 
+viz_text = """Please choose one of the following options for visualization:
+    (1) Transactions/Customers
+    (2) Loans
+    (9) Go back to previous menu
+    (0) Exit program"""
 
+viz_text1 = """Choose an option:
+        (1) Transaction type with highest transaction count
+        (2) State with highest number of customers
+        (3) Total amount of transactions' value for the top 10 customers and highest value customer
+        (9) Go back to previous menu
+        (0) Exit program"""
+
+viz_text2 = """Choose an option:
+        (1) Percentage of approved loans for self-employed applicanst
+        (2) Percentage of rejected loans for married male applicants
+        (3) Months with the largest amount of volume of transaction data
+        (4) Branch with highest total value of healthcare transactions
+        (9) Go back to previous menu
+        (0) Exit program"""
