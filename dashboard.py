@@ -21,7 +21,6 @@ def menu_box(menu_msg, method1, method2, method3, method4):
     while(not exit_flag):         
         print(menu_msg)
         menu_option = input()
-        # print('you chose {}'.format(menu_option))
         if menu_option == '1':
             method1(menu_option)
         elif menu_option == '2':
@@ -101,13 +100,6 @@ def transactions_type(null):
                 db_cursor.execute(query)
                 all_transactions = db_cursor.fetchall()
                 print_short_report(trans_type_name, all_transactions)
-                # if len(all_transactions) > 0:
-                #     print("DETAILS OF TRANSACTIONS OF TYPE {}".format(trans_type_dict[trans_type].upper()))
-                #     print("------------------------------------------")
-                #     print("Number of transactions: {}".format(all_transactions[0][0]))
-                #     print("Total value of transactions: ${}".format(round(all_transactions[0][1], 2)))
-                # else:
-                #     print("No transactions")
             elif (trans_type == '9'):
                 break
             elif (trans_type == '0'):
@@ -118,7 +110,6 @@ def transactions_type(null):
         else:
             print('Invalid option. Try again')
         continue_inquiry = continue_method() #if a key is entered, we can keep checking
-        # print('there')
 
 def transactions_state(menu_option):
     print("here " + menu_option)
@@ -135,12 +126,7 @@ def transactions_state(menu_option):
                     WHERE BRANCH_STATE = '{}'""".format(state)
         db_cursor.execute(query)
         all_transactions = db_cursor.fetchall()
-        # for transaction in all_transactions:
-        #     print(transaction)
         print_short_report(state, all_transactions )
-        # print(type(all_transactions))
-        # for x in all_transactions:
-        #     print(x)
         continue_inquiry = continue_method()
 
 def customers_menu():
@@ -178,8 +164,6 @@ def customers_search(menu_option, method):
 
 def customers_show_details(menu_option):
     customers_search(menu_option, customers_query_details)
-    print("heeeelloooo")
-
 
 #menu_option just a place_holder    
 def customers_query_details(sql_key, value1, value2, menu_option):
@@ -191,9 +175,6 @@ def customers_query_details(sql_key, value1, value2, menu_option):
     db_cursor.execute(query)
     all_details = db_cursor.fetchall()
     if len(all_details) > 0:
-        # for d in all_details:
-        #     print(d)
-        # print(all_details)
         (first_name, last_name, ssn, credit_card_no) = all_details[0]
         print("heeere   {},{},{},{}".format(first_name, last_name, ssn, credit_card_no))
     print('at this point ' + menu_option)
@@ -219,16 +200,12 @@ def customers_update_details(credit_card_no):
         elif option == '8':
             save_updates = True
             updated_data = updated_data[0:len(updated_data)-1]
-            # print(updated_data)
-            # db_connection.start_transaction()
             update = """UPDATE cdw_sapp_customer
                         SET {}
                         WHERE CREDIT_CARD_NO = '{}'""".format(updated_data, credit_card_no)
-            # print(update)
             db_cursor.execute(update)
             db_connection.commit()
             print('Data has been updated')
-            #here we update the db and commit
         elif option == '9':
             break
         elif option == '0':
@@ -236,8 +213,6 @@ def customers_update_details(credit_card_no):
             break #We don't use save_updates because we are not saving the changes. 
         else:
             print("Invalid option. Try again")
-
-
 
 
 def customers_show_operations(menu_option):
@@ -287,8 +262,6 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
                     INNER JOIN cdw_sapp_customer USING (CREDIT_CARD_NO)
                     WHERE {} = '{}' AND TIMEID like '{}%'
                     GROUP BY CREDIT_CARD_NO, FIRST_NAME, MIDDLE_NAME, LAST_NAME, FULL_STREET_ADDRESS, CUST_CITY, CUST_STATE, CUST_COUNTRY, CUST_ZIP, CUST_EMAIL""".format(sql_key, identifier, date1)
-        # db_cursor.execute(query2)
-        # bill_summary = db_cursor.fetchone()
     elif menu_option == '4': #transactions between mm1/yyyy1 and mm2/yyyy2
         print('Enter starting date (mm/yyyy):')
         date1 = input()
@@ -303,24 +276,16 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
         dates = (date1, date2)
         date1 = int(date1[3:7]+date1[0:2]+'01')
         date2 = int(date2[3:7]+date2[0:2]+'31') #it doesn't matter that a month has 28, 29, 30 days. No filtering error possible
-        # print(date1, date2)
-        # print(dates)
         query2 = """SELECT FIRST_NAME, MIDDLE_NAME, LAST_NAME
                     FROM cdw_sapp_customer
                     WHERE CREDIT_CARD_NO = '{}'""".format(identifier)
-        # print(query2)
-        # print(identifier)
+
     # Phase 4: Complete and execute de query for all transactions
-    # print('first point')
     db_cursor.execute(query2)
-    # print('this other point')
     account_summary = db_cursor.fetchone()
-    # print(type(account_summary))
     query1 = query1 + 'ORDER BY TIMEID DESC'
-    # print('second point')
     db_cursor.execute(query1)
     all_transactions = db_cursor.fetchall()
-    # print(all_transactions)
 
     # Phase 5: Output the data retrieved in their respective format
     if menu_option == '3':  #Monthly bill
