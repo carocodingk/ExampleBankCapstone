@@ -243,20 +243,21 @@ def customers_show_operations(menu_option):
     # print('customers_show_operations')
 
 def customers_query_transactions(sql_key, value1, value2, menu_option):
+    #Phase 1: retrieves or assigns the credit card number as criteria to search the database
     subquery = ""
-    if (sql_key == 'cust.SSN'):
+    if (sql_key == 'cust.SSN'): #Search by ssn
         subquery = """  SELECT CREDIT_CARD_NO
                         FROM cdw_sapp_customer 
                         WHERE SSN = '{}'""".format(value1)
     elif (sql_key == 'cust.CREDIT_CARD_NO'):
         identifier = value1
         sql_key = 'CREDIT_CARD_NO'
-    elif sql_key == 'cust.FIRST_NAME':
+    elif sql_key == 'cust.FIRST_NAME': #Search by first and last name
         subquery = """  SELECT CREDIT_CARD_NO
                         FROM cdw_sapp_customer AS cust
                         WHERE cust.FIRST_NAME = '{}' AND cust.LAST_NAME = '{}'""".format(value1, value2)
         
-    if len(subquery) > 0:
+    if len(subquery) > 0:   #if the search is by credit card, we don't need to retrieve it
         db_cursor.execute(subquery)
         data = db_cursor.fetchone()
         sql_key = 'CREDIT_CARD_NO' #so we can use one query statement for all
@@ -264,33 +265,31 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
             identifier = data[0]
         else:
             identifier = ' '
-    print(identifier)
 
-    #General query with some customer's details and transactions
-    query1 = """ SELECT cred.TIMEID, cred.TRANSACTION_ID, cred.TRANSACTION_TYPE, cred.TRANSACTION_VALUE
+    #Phase 2: General query for transactions details with credit card number as search criteria
+    query1 = """ SELECT TIMEID, TRANSACTION_ID, TRANSACTION_TYPE, TRANSACTION_VALUE
                 FROM cdw_sapp_credit_card AS cred
                 WHERE {} = '{}'""".format(sql_key, identifier)
     
-    #Select specific month/year
+    #Phase 3: Select specific time period. If monthly statement just month/year. If transactions asks for two dates,
     if menu_option == '3': #monthly bill
         print('Enter date (mm/yyyy):')
         date1 = input()
         date1 = date1[3:7]+date1[0:2] #Format as db
-        query1 = query1 + "AND TIMEID like '{}%'".format(date1)
-        # Add total and number of transactions
+        query1 = query1 + "AND TIMEID like '{}%'".format(date1) #Queries only for that month
+        # Find customer's details for bill as well as number of transactions and total for that month
         query2 = """SELECT  cred.CREDIT_CARD_NO, cust.FIRST_NAME, MIDDLE_NAME, cust.LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL,
                             COUNT(cred.TRANSACTION_ID), SUM(cred.TRANSACTION_VALUE)
                     FROM cdw_sapp_credit_card AS cred
                     INNER JOIN cdw_sapp_customer AS cust USING (CREDIT_CARD_NO)
                     WHERE {} = '{}' AND TIMEID like '{}%'
                     GROUP BY CREDIT_CARD_NO, FIRST_NAME, MIDDLE_NAME, LAST_NAME, cust.FULL_STREET_ADDRESS, cust.CUST_CITY, cust.CUST_STATE, cust.CUST_EMAIL""".format(sql_key, identifier, date1)
-        # print("at this other point")
         db_cursor.execute(query2)
-        total_transactions = db_cursor.fetchall()
-        if total_transactions is not None:
-            # print('count and total')
-            for f in total_transactions:
-                print(f)
+        bill_summary = db_cursor.fetchall()
+        # if total_transactions is not None:
+        #     print('count and total')
+        #     for f in total_transactions:
+        #         print(f)
     elif menu_option == '4': #transactions between mm1/yyyy1 and mm2/yyyy2
         print('Enter starting date (mm/yyyy):')
         date1 = input()
@@ -300,12 +299,12 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
         date2 = int(date2[3:7]+date2[0:2]+'31')
         print(date1, date2)
     
-    # print('breakpoint1')
+    # Phase 4: Complete and execute de query for all transactions
     query1 = query1 + 'ORDER BY TIMEID DESC'
     db_cursor.execute(query1)
     all_transactions = db_cursor.fetchall()
-    # print('breakpoint2')
 
+    # Phase 5: Output the data retrieved in their respective format
     if menu_option == '3':  #Monthly bill
         # print('printing1')
         if all_transactions is not None:
@@ -315,7 +314,7 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
     elif menu_option == '4': #Transactions between dates
         if all_transactions is not None:
             for t in all_transactions:
-                if (int(t[0]) >= date1 and int(t[0]) <= date2):
+                if (int(t[0]) >= date1 and int(t[0]) <= date2): #filtering by dates
                     print(t[0] + '   ' + str(t[1]) + ' hhhhhhh ' + t[2] + str(t[3]))
 
 
