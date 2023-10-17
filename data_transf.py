@@ -1,6 +1,6 @@
 '''FUNCTION DEFINITIONS FOR DATA TRANSFORMATION'''
 from tabulate import tabulate
-from text_variables import trans_type_dict, trans_states_dict
+# from text_variables import trans_type_dict, trans_states_dict
 
 '''Reformats the phone number 1234567890 to (123)456-7890. 
 If input is longer than 10 digits, it returns the first 10 digits. 
@@ -50,12 +50,15 @@ def print_zip_report(date, zip, transactions):
         print('There are not transactions under this criteria\n')
 
 def print_short_report(criteria, transactions):
-    if len(transactions) > 0:
-        print("DETAILS OF TRANSACTIONS OF TYPE {}".format(trans_type_dict[criteria].upper()))
-        print("------------------------------------------")
-        print("Number of transactions: {}".format(transactions[0][0]))
+    # if transactions is not None:
+    print("##########################################")
+    print("DETAILS OF TRANSACTIONS OF TYPE {}".format(criteria.upper()))
+    print("------------------------------------------")
+    print("Number of transactions: {}".format(transactions[0][0]))
+    if transactions[0][1] is not None:
         print("Total value of transactions: ${}".format(round(transactions[0][1], 2)))
     else:
-        print("There are not transactions under this criteria\n")
+        print('Total value of transactions: $0')
+        print("There are not transactions under this criteria")
     print("------------------------------------------")
     

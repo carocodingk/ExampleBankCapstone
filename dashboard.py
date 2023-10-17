@@ -92,12 +92,13 @@ def transactions_type(null):
         trans_type = input()
         if (trans_type.isnumeric()):
             if (int(trans_type) in range(1,8)):
+                trans_type_name = trans_type_dict[trans_type]
                 query = """ SELECT COUNT(TRANSACTION_ID), SUM(TRANSACTION_VALUE)
                 FROM CDW_SAPP_CREDIT_CARD
-                WHERE TRANSACTION_TYPE = '{}'""".format(trans_type_dict[trans_type])
+                WHERE TRANSACTION_TYPE = '{}'""".format(trans_type_name)
                 db_cursor.execute(query)
                 all_transactions = db_cursor.fetchall()
-                print_short_report(trans_type, all_transactions)
+                print_short_report(trans_type_name, all_transactions)
                 # if len(all_transactions) > 0:
                 #     print("DETAILS OF TRANSACTIONS OF TYPE {}".format(trans_type_dict[trans_type].upper()))
                 #     print("------------------------------------------")
@@ -113,9 +114,9 @@ def transactions_type(null):
             else:
                 print('Invalid option. Try again')
         else:
-            print('another option {}'.format(trans_type))
+            print('Invalid option. Try again')
         continue_inquiry = continue_method() #if a key is entered, we can keep checking
-        print('there')
+        # print('there')
 
 def transactions_state(menu_option):
     print("here " + menu_option)
@@ -132,8 +133,12 @@ def transactions_state(menu_option):
                     WHERE BRANCH_STATE = '{}'""".format(state)
         db_cursor.execute(query)
         all_transactions = db_cursor.fetchall()
-        for transaction in all_transactions:
-            print(transaction)
+        # for transaction in all_transactions:
+        #     print(transaction)
+        print_short_report(state, all_transactions )
+        # print(type(all_transactions))
+        # for x in all_transactions:
+        #     print(x)
         continue_inquiry = continue_method()
 
 def customers_menu():
