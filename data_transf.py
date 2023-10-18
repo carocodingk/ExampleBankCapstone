@@ -73,8 +73,8 @@ def print_monthly_bill(date, bill_summary, all_transactions):
         text = text + "         MONTHLY BILL FOR {} \n".format(date)
         trans = []
         header = ['Date', 'Trans. ID', 'Description', 'Amount ($)']
-        text1 = "Number of transactions: {} \n".format(bill_summary[10])
-        text1 = text1 + "Total: {}".format(bill_summary[11 ])
+        text1 = "\nNumber of transactions: {} \n".format(bill_summary[10])
+        text1 = text1 + "Total: ${}".format(bill_summary[11 ])
         for tr in all_transactions:
             date = tr[0][4:6] + '/' + tr[0][6:] + '/' + tr[0][0:2]
             trans.append([date, tr[1], tr[2], round(tr[3],2)])
@@ -85,7 +85,32 @@ def print_monthly_bill(date, bill_summary, all_transactions):
     else:
         print('This account does not exist in our database')
     print("------------------------------------------")
+
+def print_monthly_bill1(date, bill_summary, all_transactions):
     
+    if bill_summary is not None:
+        print("Enter a name for the file without spaces or special characters: (no need to add extension)")
+        filename = input()
+        with open(filename + '.txt', 'w') as new_file:
+            new_file.write("##########################################")
+            text = "\nClient: {} {} {} \n".format(bill_summary[1], bill_summary[2], bill_summary[3])
+            text = text + "Address: {}, {}, {}, {}, {} \n".format(bill_summary[4], bill_summary[5], bill_summary[6], bill_summary[7], bill_summary[8])
+            text = text + "Email: {} \n".format(bill_summary[9])
+            text = text + "Account: {} \n\n".format(privacy_string(bill_summary[0]))
+            text = text + "         MONTHLY BILL FOR {} \n".format(date)
+            trans = []
+            header = ['Date', 'Trans. ID', 'Description', 'Amount ($)']
+            text1 = "\nNumber of transactions: {} \n".format(bill_summary[10])
+            text1 = text1 + "Total: ${}".format(round(bill_summary[11 ],2))
+            for tr in all_transactions:
+                date = tr[0][4:6] + '/' + tr[0][6:] + '/' + tr[0][0:2]
+                trans.append([date, tr[1], tr[2], round(tr[3],2)])
+            new_file.write(text)
+            new_file.write(tabulate(trans, headers=header, tablefmt='pretty'))
+            new_file.write(text1)
+            new_file.write("\n------------------------------------------")
+        print('\n>>>>> Success! Your monthly bill has been printed')
+            
 
 def print_transactions(date1, date2, dates, customer_info, identifier, all_transactions):
     if customer_info is not None and all_transactions is not None:

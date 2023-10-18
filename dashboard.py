@@ -7,7 +7,7 @@ from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
 from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2, cust_update_dict
 from text_variables import viz_text, viz_text1, viz_text2, viz_months_dict, viz_text3, viz_text4, viz_text5, viz_text6, viz_text7, viz_text8, viz_text9
-from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill, print_transactions, print_customer_details, privacy_string
+from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill, print_transactions, print_customer_details, privacy_string, print_monthly_bill1
 from secret import db_username, db_password
 
 exit_flag = False
@@ -112,7 +112,7 @@ def transactions_type(null):
         continue_inquiry = continue_method() #if a key is entered, we can keep checking
 
 def transactions_state(menu_option):
-    print("here " + menu_option)
+    # print("here " + menu_option)
     continue_inquiry = True
     while(continue_inquiry):
         continue_inquiry = False
@@ -317,6 +317,7 @@ def customers_query_transactions(sql_key, value1, value2, menu_option):
     # Phase 5: Output the data retrieved in their respective format
     if menu_option == '3':  #Monthly bill
         print_monthly_bill(date, account_summary, all_transactions)
+        print_monthly_bill1(date, account_summary, all_transactions)
     elif menu_option == '4': #Transactions between dates
         print_transactions(date1, date2, dates, account_summary, identifier, all_transactions)
 
