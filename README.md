@@ -5,7 +5,6 @@
 This project emulates some of the processes that would take place in a bank. We need to manage an ETL (extraction, transformation, loading) process, a front-end to for the user to interact and input instructions to the system and a data analysis/visualization component to retrieve the data that we need.
 <img src='./images/bank_system_workflow.png' title='Bank system schema'>fig. 1: Bank system schema</img>
 
-
 At first, we have three JSON files that contain personal information of customers, information about the bank branches, information about transactions during 2018, respectively. The first step is extract this data from the files and store it in Spark dataframes, transform them into a required format and load them into a database resulting in one table per file. At the same time, we have a fourth source of data from a data API endpoint that we need to include in our database but without transformation. 
 
 The transformations that were required for each table can be seen on the following images. However, some of them as varchar(n) are not supported by PySpark.
@@ -38,6 +37,8 @@ As we can observe in the following figures, some of the requirements shared comm
     <li>Add a secret.txt file that contains your user and password for the databaser server. Save them as db_user and db_password</li>
     <li>Run main.py</li>
 </ol>
+
+
 ### Chalenges and Recommendations
 <ul>
     <li>Add a secret file to the root folder of the project, which must include your user and password to access the database server.</li>

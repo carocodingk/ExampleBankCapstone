@@ -363,6 +363,7 @@ def viz_high_number_customers(null):
     plt.title("Comparisson between the top 5 states with the most customers during 2018")
     plt.xlabel('States')
     plt.ylabel('Number of customers')
+    plt.grid(linestyle='--')
     plt.show()
 
 
@@ -480,6 +481,7 @@ def viz_top_months(null):
     plt.ylim(200000, 206000)
     plt.xlabel('Months')
     plt.ylabel('Transaction value ($)')
+    plt.grid(linestyle='--')
     plt.show()
 
 
@@ -518,6 +520,7 @@ def viz_branch_healthcare(null):
     plt.ylabel('Branch ID, City, State')
     plt.xticks(rotation = 30)
     plt.xlabel('Total Amount ($)')
+    plt.grid(linestyle='--')
     plt.show()
 
 def tuple_extraction(ls):
