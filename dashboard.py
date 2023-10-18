@@ -538,12 +538,14 @@ def visualizations():
             menu_box(viz_text1, viz_transactions_types, viz_high_number_customers, viz_top_customer_transactions, invalid_option)
         elif option == '2':
             menu_box(viz_text2, viz_approved_applications, viz_rejected_marital, viz_top_months, viz_branch_healthcare)
+            print('here')
         elif option == '9':
             break
         elif option == '0':
             exit_program()
         else:
             print("Invalid option. Try again")
+        continue_inquiry = True
 
 
 
@@ -566,7 +568,6 @@ try:
         elif main_menu_option == '2':
             customers_menu()
         elif main_menu_option == '3':
-            print("visualization")
             visualizations()
         elif main_menu_option == '0':
             exit_flag = True
