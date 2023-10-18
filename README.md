@@ -22,7 +22,9 @@ From our front-end console, we retrieve the data from the database through MySQL
 
 The system works on the terminal. We use keys to choose options from menus and submenus, go back to a previous menu or exit the program. 
 
-
+<img src="./images/main_menu.png"></src>
+<img src="./images/transactions.png"></src>
+<img src="./images/customers.png"></src>
 
 ### Chalenges and Recommendations
 <ul>
