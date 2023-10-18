@@ -176,3 +176,23 @@ viz_text2 = """Choose an option:
         (4) Branch with highest total value of healthcare transactions
         (9) Go back to previous menu
         (0) Exit program"""
+
+viz_months_dict = {
+    "01": 'January',
+    "02": 'February',
+    "03": 'March',
+    "04": 'April',
+    "05": 'May',
+    "06": 'June',
+    "07": 'July', 
+    "08": 'August',
+    "09": 'September',
+    "10": 'October',
+    "11": 'November',
+    "12": 'December'
+}
+
+viz_text9 = """Branch which processed the highest total value of healthcare transactions is: 
+{} - {}
+Located in {}, {}, {}, {}
+With a total amount of: ${}"""

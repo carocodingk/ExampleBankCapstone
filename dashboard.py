@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
 from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2, cust_update_dict
-from text_variables import viz_text, viz_text1, viz_text2
+from text_variables import viz_text, viz_text1, viz_text2, viz_months_dict,viz_text9
 from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill, print_transactions, print_customer_details
 from secret import db_username, db_password
 
@@ -16,7 +16,6 @@ exit_flag = False
     and then the loop continues until a valid option is entered. Menu_option is just a placeholder'''
 def invalid_option(menu_option):
     print('Invalid option. Try again')
-
 
 def menu_box(menu_msg, method1, method2, method3, method4):
     while(not exit_flag):         
@@ -446,10 +445,83 @@ def viz_rejected_marital(null):
     print("Percentage of applications REJECTED for MARRIED MALE applicants: {}%".format(percentage_application[4]))
 
 """Find and plot the top three months with the largest volume of transaction data."""
+def viz_top_months(null):
+    month_values = []
+    for month in ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']:
+        query = """ SELECT SUM(TRANSACTION_VALUE)
+                    FROM cdw_sapp_credit_card
+                    WHERE TIMEID LIKE '____{}__';""".format(month)
+        db_cursor.execute(query)
+        amount = db_cursor.fetchone()
+        month_values.append((month, round(amount[0],2)))
+    month_values.sort(key=lambda a:a[1], reverse=True)
+    top_months = [month_values[0], month_values[1], month_values[2]]
+    months = [viz_months_dict[month_values[0][0]], viz_months_dict[month_values[1][0]], viz_months_dict[month_values[2][0]]]
+    amounts = [month_values[0][1], month_values[1][1], month_values[2][1]]
+    print(top_months)
+    print(months)
+    print(amounts)
+    #First subplot - plot of total amount
+    plt.subplot(1,2,1)
+    plt.bar(months, amounts)
+    plt.title("Top 3 months with highest transaction value in 2018")
+    plt.xlabel('Months')
+    plt.ylabel('Transaction value ($)')
+
+    #Second subplot - focused on $200,000 and up to see difference
+    plt.subplot(1,2,2)
+    plt.bar(months, amounts)
+    plt.title("Difference between top 3 months in 2018")
+    plt.ylim(200000, 206000)
+    plt.xlabel('Months')
+    plt.ylabel('Transaction value ($)')
+    plt.show()
 
 
 
 """Find and plot which branch processed the highest total dollar value of healthcare transactions."""
+def viz_branch_healthcare(null):
+    query = """ SELECT BRANCH_CODE, ROUND(SUM(TRANSACTION_VALUE),2) AS TOTAL
+                FROM cdw_sapp_credit_card
+                WHERE TRANSACTION_TYPE = 'Healthcare'
+                GROUP BY BRANCH_CODE
+                ORDER BY TOTAL DESC
+                LIMIT 8;"""
+    db_cursor.execute(query)
+    branch_value = db_cursor.fetchall()
+    branch_codes, amounts = tuple_extraction(branch_value) #data is organized from greatest amount to least
+    branches = []
+    counter = 0
+    for code in branch_codes:
+        if counter == 0:
+            query1 = """SELECT branch_code, BRANCH_NAME, BRANCH_STREET, BRANCH_CITY, BRANCH_STATE, BRANCH_ZIP
+                        FROM cdw_sapp_branch
+                        WHERE BRANCH_CODE = {};""".format(code)   
+            db_cursor.execute(query1)
+            top_branch_data = db_cursor.fetchone()
+            print(viz_text9.format(top_branch_data[1], top_branch_data[0], top_branch_data[2], top_branch_data[3], top_branch_data[4], top_branch_data[5], amounts[0]))
+        query1 = """SELECT branch_code, BRANCH_CITY, BRANCH_STATE
+                    FROM cdw_sapp_branch
+                    WHERE BRANCH_CODE = {};""".format(code)
+        db_cursor.execute(query1)
+        branch_data = db_cursor.fetchone()
+        text = "{}-{}, {}".format(branch_data[0], branch_data[1], branch_data[2])
+        branches.append(text)
+        counter += 1
+    plt.barh(branches, amounts)
+    plt.title('Top 8 of branches with highest total value of healthcare transactions', weight='bold')
+    plt.ylabel('Branch ID, City, State')
+    plt.xticks(rotation = 30)
+    plt.xlabel('Total Amount ($)')
+    plt.show()
+
+def tuple_extraction(ls):
+    first_list = []
+    second_list = []
+    for item in ls:
+        first_list.append(item[0])
+        second_list.append(item[1])
+    return first_list, second_list
 
 def visualizations():
     continue_inquiry = True
@@ -460,7 +532,7 @@ def visualizations():
         if option == '1':
             menu_box(viz_text1, viz_transactions_types, viz_high_number_customers, viz_top_customer_transactions, invalid_option)
         elif option == '2':
-            menu_box(viz_text2, viz_approved_applications, viz_rejected_marital, invalid_option, invalid_option)
+            menu_box(viz_text2, viz_approved_applications, viz_rejected_marital, viz_top_months, viz_branch_healthcare)
         elif option == '9':
             break
         elif option == '0':
