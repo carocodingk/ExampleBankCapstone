@@ -192,7 +192,37 @@ viz_months_dict = {
     "12": 'December'
 }
 
-viz_text9 = """Branch which processed the highest total value of healthcare transactions is: 
+viz_text3 = """#########################################################\n
+Transactions of type {} has the highest occurrence with {} during 2018
+__________________________________________________________"""
+
+viz_text4 = """#########################################################\n
+State with the highest number of customers is {} with {} clients
+__________________________________________________________"""
+
+viz_text5 = """#########################################################\n
+CUSTOMER WITH THE HIGHEST TOTAL TRANSACTION VALUE:
+Name: {} {} {}
+From: {}, {}
+Account: {}
+Total amount: ${}
+__________________________________________________________"""
+
+viz_text6 = """#########################################################\n
+Percentage of applications REJECTED for MARRIED MALE applicants: {}%
+{} Married, male applicants were rejected out of a total of {} applications
+__________________________________________________________"""
+
+viz_text7 = """#########################################################\n
+The months with the highest volume of transaction value during 2018 are:
+1 - {} with ${}
+2 - {} with ${}
+3 - {} with ${}
+__________________________________________________________"""
+
+viz_text9 = """#########################################################\n
+Branch which processed the highest total value of healthcare transactions is: 
 {} - {}
 Located in {}, {}, {}, {}
-With a total amount of: ${}"""
+With a total amount of: ${}
+__________________________________________________________"""

@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
 from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2, cust_update_dict
-from text_variables import viz_text, viz_text1, viz_text2, viz_months_dict,viz_text9
-from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill, print_transactions, print_customer_details
+from text_variables import viz_text, viz_text1, viz_text2, viz_months_dict, viz_text3, viz_text4, viz_text5, viz_text6, viz_text7, viz_text9
+from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill, print_transactions, print_customer_details, privacy_string
 from secret import db_username, db_password
 
 exit_flag = False
@@ -334,7 +334,7 @@ def viz_transactions_types(null):
         trans_type.append(t[0])
         trans_count.append(t[1])
     all_data.sort()
-    print("Transactions of type {} has the highest occurrence with {} during 2018".format(all_data[0][0].upper(), all_data[0][1]))
+    print(viz_text3.format(all_data[0][0].upper(), all_data[0][1]))
     plt.bar(trans_type, trans_count)
     plt.grid(linestyle='--')
     plt.title("Quantity of transactions by type during 2018")
@@ -356,13 +356,20 @@ def viz_high_number_customers(null):
     for c in all_data:
         cust_state.append(c[0])
         cust_count.append(c[1])
+    print(viz_text4.format(cust_state[0], cust_count[0]))
     print(cust_state)
     print(cust_count)
+    plt.bar(cust_state, cust_count)
+    plt.title("Comparisson between the top 5 states with the most customers during 2018")
+    plt.xlabel('States')
+    plt.ylabel('Number of customers')
+    plt.show()
 
 
 """Find and plot the sum of all transactions for the top 10 customers, and which customer has the highest transaction amount.
 Hint (use CUST_SSN).  Don’t show ppi (ssn) how to represent?"""
 def viz_top_customer_transactions(null):
+    print("testing")
     query = """ SELECT CUST_SSN, SUM(TRANSACTION_VALUE) AS TOTAL
                 FROM cdw_sapp_credit_card
                 GROUP BY CUST_SSN
@@ -372,11 +379,25 @@ def viz_top_customer_transactions(null):
     all_data = db_cursor.fetchall()
     cust_id =[]
     cust_total = []
+    counter = 1
     for data in all_data:
-        cust_id.append(data[0])
-        cust_total.append(data[1])
-    print(cust_id)
-    print(cust_total)
+        cust_id.append('Client '+ str(counter)) #To maintain their anonimaty
+
+        cust_total.append(round(data[1],2))
+        counter += 1
+    query1 = """SELECT FIRST_NAME, MIDDLE_NAME, LAST_NAME, CUST_CITY, CUST_STATE, cust.CREDIT_CARD_NO
+                FROM cdw_sapp_customer AS cust
+                INNER JOIN cdw_sapp_credit_card AS cred ON cust.SSN = cred.CUST_SSN
+                WHERE SSN = '{}'
+                GROUP BY cust.CREDIT_CARD_NO, FIRST_NAME, MIDDLE_NAME, LAST_NAME, CUST_CITY, CUST_STATE;""".format(str(all_data[0][0]))
+    db_cursor.execute(query1)
+    cust = db_cursor.fetchone()
+    print(viz_text5.format(cust[0].upper(), cust[1].upper(), cust[2].upper(), cust[3], cust[4], privacy_string(cust[5]), cust_total[0]))
+    plt.bar(cust_id, cust_total)
+    plt.title('Comparisson of total transaction value between top 10 customers')
+    plt.xlabel('Customers')
+    plt.ylabel('Total value of transactions ($)')
+    plt.show()
 
 
 """Find and plot the percentage of applications approved for self-employed applicants."""
@@ -431,6 +452,8 @@ def viz_rejected_marital(null):
     #(Approved, Gender, Married)
     criteria = [('Y', "Male", "Yes"), ('Y', "Male", "No"), ('Y', "Female", "Yes"), ('Y', "Female", "No"),
                 ('N', "Male", "Yes"), ('N', "Male", "No"), ('N', "Female", "Yes"), ('N', "Female", "No")]
+    desc = ['Approved, Male, Married', 'Approved, Male, Not married', 'Approved, Female, Married', 'Approved, Female, Not married',
+            'Rejected, Male, Married', 'Rejected, Male, Not married', 'Rejected, Female, Married', 'Rejected, Female, Not married']
     applications = []
     for i in criteria:
         query = """ SELECT COUNT(DISTINCT Application_ID)
@@ -439,13 +462,19 @@ def viz_rejected_marital(null):
         db_cursor.execute(query)
         data = db_cursor.fetchone()
         applications.append(data[0])
-    print(applications)
     total_applications = sum(applications)
     percentage_application = []
     for i in applications:
         percentage_application.append(round(i * 100 / total_applications))
-    print(percentage_application)
-    print("Percentage of applications REJECTED for MARRIED MALE applicants: {}%".format(percentage_application[4]))
+    # print(applications)
+    # print(percentage_application)
+    print(viz_text6.format(percentage_application[4], applications[4], total_applications))
+    explode_list = [0,0,0,0,0.2,0,0,0]
+    plt.subplots(figsize =(10, 7))
+    plt.pie(percentage_application, autopct='%1.1f%%', explode=explode_list)
+    plt.title('Distribution of loan application results according to gender and marital status')
+    plt.legend(desc, bbox_to_anchor=(1,0.75))
+    plt.show()
 
 """Find and plot the top three months with the largest volume of transaction data."""
 def viz_top_months(null):
@@ -461,9 +490,7 @@ def viz_top_months(null):
     top_months = [month_values[0], month_values[1], month_values[2]]
     months = [viz_months_dict[month_values[0][0]], viz_months_dict[month_values[1][0]], viz_months_dict[month_values[2][0]]]
     amounts = [month_values[0][1], month_values[1][1], month_values[2][1]]
-    print(top_months)
-    print(months)
-    print(amounts)
+    print(viz_text7.format(months[0], top_months[0][1], months[1], top_months[1][1], months[2], top_months[2][1]))
     #First subplot - plot of total amount
     plt.subplot(1,2,1)
     plt.bar(months, amounts)
