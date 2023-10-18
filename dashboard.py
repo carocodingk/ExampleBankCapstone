@@ -6,7 +6,7 @@ from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
 from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2, cust_update_dict
 from text_variables import viz_text, viz_text1, viz_text2
-from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill, print_transactions
+from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill, print_transactions, print_customer_details
 from secret import db_username, db_password
 
 exit_flag = False
@@ -167,18 +167,40 @@ def customers_show_details(menu_option):
 
 #menu_option just a place_holder    
 def customers_query_details(sql_key, value1, value2, menu_option):
-    query = """ SELECT cust.FIRST_NAME, cust.LAST_NAME, cust.SSN, cust.CREDIT_CARD_NO
-                FROM cdw_sapp_customer AS cust
-                WHERE {} = '{}'""".format(sql_key, value1)
-    if value2 != 'x': #If the search is by first and last name. We need to values
-        query = query + " AND cust.LAST_NAME = '{}';".format(value2)
-    db_cursor.execute(query)
-    all_details = db_cursor.fetchall()
-    if len(all_details) > 0:
-        (first_name, last_name, ssn, credit_card_no) = all_details[0]
-        print("heeere   {},{},{},{}".format(first_name, last_name, ssn, credit_card_no))
-    print('at this point ' + menu_option)
-    if menu_option == '2': #update customer's details
+    continue_inquiry = True
+    while(continue_inquiry):
+        query = """ SELECT *
+                    FROM cdw_sapp_customer AS cust
+                    WHERE {} = '{}'""".format(sql_key, value1)
+        if value2 != 'x': #If the search is by first and last name. We need to values
+            query = query + " AND cust.LAST_NAME = '{}';".format(value2)
+        db_cursor.execute(query)
+        all_details = db_cursor.fetchone()
+        if all_details is not None:
+            credit_card_no = all_details[4]
+            print_customer_details(all_details)
+        else:
+            print('This customer does not exist in the database')
+        
+        if menu_option == '1':
+            print("Press   (9) Return to previous menu \n        (0) Exit program")
+            continue_key = input()
+            if continue_key == '9':
+                continue_inquiry = False
+            elif continue_key == '0':
+                exit_program()
+                break
+        else:
+            print("Press   Any key to continue \n        (0) Exit program")
+            continue_key = input()
+            if continue_key == '0':
+                exit_program()
+                break
+            else:
+                break
+                
+
+    if menu_option == '2' and exit_flag == False: #update customer's details
         customers_update_details(credit_card_no)
         print('AT THIS POINT ' + menu_option)
 

@@ -20,7 +20,6 @@ Choose one of the options to see transactions:
     (1) Per zip code for date (mm/yyyy)
     (2) Per type
     (3) Per state
-    (4) Visualization
     (9) Return to previous menu
     (0) Exit program"""
 

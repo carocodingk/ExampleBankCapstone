@@ -52,7 +52,7 @@ def print_zip_report(date, zip, transactions):
 def print_short_report(criteria, transactions):
     # if transactions is not None:
     print("##########################################")
-    print("DETAILS OF TRANSACTIONS OF TYPE {}".format(criteria.upper()))
+    print("DETAILS OF TRANSACTIONS FOR {}".format(criteria.upper()))
     print("------------------------------------------")
     print("Number of transactions: {}".format(transactions[0][0]))
     if transactions[0][1] is not None:
@@ -65,6 +65,7 @@ def print_short_report(criteria, transactions):
 
 def print_monthly_bill(date, bill_summary, all_transactions):
     if bill_summary is not None:
+        print("##########################################")
         text = "\nClient: {} {} {} \n".format(bill_summary[1], bill_summary[2], bill_summary[3])
         text = text + "Address: {}, {}, {}, {}, {} \n".format(bill_summary[4], bill_summary[5], bill_summary[6], bill_summary[7], bill_summary[8])
         text = text + "Email: {} \n".format(bill_summary[9])
@@ -83,10 +84,12 @@ def print_monthly_bill(date, bill_summary, all_transactions):
         print('\n>>>>> Success! Your monthly bill has been generated')
     else:
         print('This account does not exist in our database')
+    print("------------------------------------------")
     
 
 def print_transactions(date1, date2, dates, customer_info, identifier, all_transactions):
     if customer_info is not None and all_transactions is not None:
+        print("\n##########################################")
         text = "\nClient: {} {} {}\n".format(customer_info[0], customer_info[1], customer_info[2])
         text = text + "Acount: {} \n\n".format(privacy_string(identifier))
         text = text + "       TRANSACTIONS BETWEEN {} AND {}\n".format(dates[0], dates[1])
@@ -103,5 +106,18 @@ def print_transactions(date1, date2, dates, customer_info, identifier, all_trans
             print("There are not transactions under this criteria")
     elif customer_info is None:
         print('This account does not exist in our database')
-    # elif customer_info is not None and all_transactions is None:
-    #     print("There are not transactions under this criteria")
+    print("------------------------------------------")
+
+
+def print_customer_details(all_details):
+    print("##########################################")
+    print("DETAILS OF TRANSACTIONS OF CUSTOMER")
+    print("------------------------------------------")
+    text = "\nClient: {} {} {} \n".format(all_details[1], all_details[2], all_details[3])
+    text = text + "SSN: {}\n".format(privacy_string(str(all_details[0])))
+    text = text + "Address: {}, {}, {}, {}, {}\n".format(all_details[5], all_details[6], all_details[7], all_details[8], all_details[9])
+    text = text + "Phone: {}\n".format(all_details[10])
+    text = text + "Email: {}\n".format(all_details[11])
+    text = text + "Account: {}\n".format(all_details[4])
+    print(text)
+    print("------------------------------------------")
