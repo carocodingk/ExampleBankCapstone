@@ -22,9 +22,13 @@ From our front-end console, we retrieve the data from the database through MySQL
 
 The system works on the terminal. We use keys to choose options from menus and submenus, go back to a previous menu or exit the program. 
 
-<img src="./images/main_menu.png"></src>
-<img src="./images/transactions.png"></src>
-<img src="./images/customers.png"></src>
+As we can observe in the following figures, some of the requirements shared common paths to achieve them such as displaying and updating customer's details. For both cases, we need to search for the customer. In every menu where we can choose an option, there are also options to go back to previous menu or end the program.
+
+<img src="./images/main_menu.jpg">fig. 5: Structure of main menu</src>
+
+<img src="./images/transactions.jpg">fig. 6: Structure of transactions module</src>
+
+<img src="./images/customers.png">fig. 7: Structure of customers module</src>
 
 ### Chalenges and Recommendations
 <ul>
