@@ -357,8 +357,8 @@ def viz_high_number_customers(null):
         cust_state.append(c[0])
         cust_count.append(c[1])
     print(viz_text4.format(cust_state[0], cust_count[0]))
-    print(cust_state)
-    print(cust_count)
+    # print(cust_state)
+    # print(cust_count)
     plt.bar(cust_state, cust_count)
     plt.title("Comparisson between the top 5 states with the most customers during 2018")
     plt.xlabel('States')
@@ -543,9 +543,10 @@ def visualizations():
             break
         elif option == '0':
             exit_program()
+            break
         else:
             print("Invalid option. Try again")
-        continue_inquiry = True
+            continue_inquiry = True
 
 
 
