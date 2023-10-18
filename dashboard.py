@@ -1,6 +1,7 @@
 import mysql.connector
 import re
 import matplotlib.pyplot as plt
+# import datetime
 
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
@@ -221,10 +222,15 @@ def customers_update_details(credit_card_no):
                 updated_data = updated_data + " {} = '{}',".format(field, new_value)
         elif option == '8':
             save_updates = True
-            updated_data = updated_data[0:len(updated_data)-1]
+            # time_now = datetime.datetime.now()
+            # print(time_now)
+            time_now = 'CURRENT_TIMESTAMP'
+            # updated_data = updated_data[0:len(updated_data)-1]
+            updated_data = updated_data + " {} = {}".format('LAST_UPDATED', time_now)
             update = """UPDATE cdw_sapp_customer
                         SET {}
                         WHERE CREDIT_CARD_NO = '{}'""".format(updated_data, credit_card_no)
+            # print(update)
             db_cursor.execute(update)
             db_connection.commit()
             print('Data has been updated')
