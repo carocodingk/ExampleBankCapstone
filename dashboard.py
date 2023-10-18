@@ -326,7 +326,6 @@ def viz_transactions_types(null):
     FROM cdw_sapp_credit_card
     GROUP BY TRANSACTION_TYPE
     ORDER BY COUNT DESC;"""
-    print("heeeeree")
     db_cursor.execute(query)
     all_data = db_cursor.fetchall()
     trans_type = []
@@ -334,9 +333,13 @@ def viz_transactions_types(null):
     for t in all_data:
         trans_type.append(t[0])
         trans_count.append(t[1])
-    print(trans_type)
-    print(trans_count)
-    plt.pie(trans_count)
+    all_data.sort()
+    print("Transactions of type {} has the highest occurrence with {} during 2018".format(all_data[0][0].upper(), all_data[0][1]))
+    plt.bar(trans_type, trans_count)
+    plt.grid(linestyle='--')
+    plt.title("Quantity of transactions by type during 2018")
+    plt.xlabel('Transaction types')
+    plt.ylabel('Quantity of transactions')
     plt.show()
 
 """Find and plot which state has a high number of customers."""
