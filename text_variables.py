@@ -220,6 +220,11 @@ The months with the highest volume of transaction value during 2018 are:
 3 - {} with ${}
 __________________________________________________________"""
 
+viz_text8 = """#########################################################\n
+Percentage of applications approved for self-employed applicants: {}%
+A total of {} loans out of {} were approved for self-employed applicants 
+__________________________________________________________"""
+
 viz_text9 = """#########################################################\n
 Branch which processed the highest total value of healthcare transactions is: 
 {} - {}

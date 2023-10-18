@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from mysql.connector import Error
 from text_variables import welcome, continue_text, main_menu_text, trans_menu_text, trans_menu_text1, trans_menu_text2, trans_type_dict, trans_menu_text3, trans_states_dict
 from text_variables import cust_menu_text, cust_menu_text1, cust_menu_text2, cust_update_dict
-from text_variables import viz_text, viz_text1, viz_text2, viz_months_dict, viz_text3, viz_text4, viz_text5, viz_text6, viz_text7, viz_text9
+from text_variables import viz_text, viz_text1, viz_text2, viz_months_dict, viz_text3, viz_text4, viz_text5, viz_text6, viz_text7, viz_text8, viz_text9
 from data_transf import title_format, print_zip_report, print_short_report, print_monthly_bill, print_transactions, print_customer_details, privacy_string
 from secret import db_username, db_password
 
@@ -402,49 +402,26 @@ def viz_top_customer_transactions(null):
 
 """Find and plot the percentage of applications approved for self-employed applicants."""
 def viz_approved_applications(null):
+    criteria = [('Y', 'Yes'), ('N', 'Yes'), ('Y', 'No'), ('N', 'No')]
     applications = [] #[self_employed_approved, self_employed_rejected, not_self_employed_approved, not_self_employed_rejected]
-    #Number of self employed applicants that are approved
-    query1 = """SELECT COUNT(DISTINCT Application_ID)
-                FROM cdw_sapp_loan_application
-                WHERE Application_Status = 'Y' AND Self_Employed = 'Yes';"""
-    db_cursor.execute(query1)
-    data = db_cursor.fetchone()
-    applications.append(data[0])
-
-    #Number of self employed applicants that are rejected
-    query2 = """SELECT COUNT(DISTINCT Application_ID)
-                FROM cdw_sapp_loan_application
-                WHERE Application_Status = 'N' AND Self_Employed = 'Yes';"""
-    db_cursor.execute(query2)
-    data = db_cursor.fetchone()
-    applications.append(data[0])
-
-    #Number of NOT self employed applicants that are approved
-    query3 = """SELECT COUNT(DISTINCT Application_ID)
-                FROM cdw_sapp_loan_application
-                WHERE Application_Status = 'Y' AND Self_Employed = 'No';"""
-    db_cursor.execute(query3)
-    data = db_cursor.fetchone()
-    applications.append(data[0])
-
-    #Number of NOT self employed applicants that are rejected
-    query4 = """SELECT COUNT(DISTINCT Application_ID)
-                FROM cdw_sapp_loan_application
-                WHERE Application_Status = 'N' AND Self_Employed = 'No';"""
-    db_cursor.execute(query4)
-    data = db_cursor.fetchone()
-    applications.append(data[0])
-
+    desc = ['Approved, self-employed', 'Rejected, self-employed', 'Approved, not self-employed', 'Rejected, not self-employed']
+    for c in criteria:
+        query = """SELECT COUNT(DISTINCT Application_ID)
+                    FROM cdw_sapp_loan_application
+                    WHERE Application_Status = '{}' AND Self_Employed = '{}';""".format(c[0], c[1])
+        db_cursor.execute(query)
+        data = db_cursor.fetchone()
+        applications.append(data[0])
     total_applications = sum(applications)
     percentage_application = []
-    print(applications)
-    print(total_applications)
-
     for i in applications:
         percentage_application.append(round(i * 100 / total_applications, 2))
-    print(percentage_application)
-
-    print("Percentage of applications approved for self-employed applicants: {}%".format(percentage_application[0]))
+    print(viz_text8.format(percentage_application[0], applications[0], total_applications))
+    explode_list = [0.2, 0, 0, 0]
+    plt.pie(percentage_application,  autopct='%1.1f%%', explode=explode_list)
+    plt.legend(desc, bbox_to_anchor=(1,0.75))
+    plt.title('Distribution of loan application results according to employment type')
+    plt.show()
 
 
 """Find the percentage of rejection for married male applicants."""
@@ -466,8 +443,6 @@ def viz_rejected_marital(null):
     percentage_application = []
     for i in applications:
         percentage_application.append(round(i * 100 / total_applications))
-    # print(applications)
-    # print(percentage_application)
     print(viz_text6.format(percentage_application[4], applications[4], total_applications))
     explode_list = [0,0,0,0,0.2,0,0,0]
     plt.subplots(figsize =(10, 7))
