@@ -38,7 +38,14 @@ As we can observe in the following figures, some of the requirements shared comm
     <li>Run main.py</li>
 </ol>
 
-
+## Visualization
+<img src="./visualization/transaction_types_counters.png">fig. 8: Types of transactions and their occurrences during 2018</img>
+<img src="./visualization/states_highest_customers_numbers.png">fig. 9: States with the highest counts of customers during 2018</img>
+<img src="./visualization/customer_highest_transactions_value.png">fig. 10: Total value of transactions for the top 10 customers during 2018</img>
+<img src="./visualization/approval_percentage_employment_type.png">fig. 11: Loan approval/rejection according to employment type</img>
+<img src="./visualization/rejection_percentage_gender_marital.png">fig. 12: Loan approval/rejection rates according to gender and marital status</img>
+<img src="./visualization/months_highest_transactions.png">fig. 13: Months with the largest transaction value of 2018</img>
+<img src="./visualization/branches_highest_healthcare_transactions.png">fig. 14: Branches with the highest healthcare transaction value with their location</img>
 ### Chalenges and Recommendations
 <ul>
     <li>Add a secret file to the root folder of the project, which must include your user and password to access the database server.</li>
