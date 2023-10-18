@@ -30,6 +30,14 @@ As we can observe in the following figures, some of the requirements shared comm
 
 <img src="./images/customers.png">fig. 7: Structure of customers module</src>
 
+
+## How to run this program
+<ol>
+    <li>Download the entire project</li>
+    <li>Install packages specified in the requirement</li>
+    <li>Add a secret.txt file that contains your user and password for the databaser server. Save them as db_user and db_password</li>
+    <li>Run main.py</li>
+</ol>
 ### Chalenges and Recommendations
 <ul>
     <li>Add a secret file to the root folder of the project, which must include your user and password to access the database server.</li>
